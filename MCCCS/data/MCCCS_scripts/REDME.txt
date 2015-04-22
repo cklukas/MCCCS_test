@@ -1,0 +1,10 @@
+MCCCS 1.0 README
+----------------
+26.03.2015
+
+Performing analysis of the example datasets
+-------------------------------------------
+
+1. Download all Files provided by the publication
+2. Run the prepare_datasets.sh script in a terminal.
+3. Enter one of the example subfolders 1-3 (e.g. 'process_hyper_example_1_classification') and run the process script e.g. 'process_hyper_example_1_classification.sh' in a terminal.

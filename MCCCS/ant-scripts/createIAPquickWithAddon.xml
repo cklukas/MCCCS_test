@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="create signed IAP-jar" name="Create Runnable Jar for IAP Cloud Computing">
+    <!--ANT 1.7 is required -->
+    <target name="create signed IAP-jar">
+    	<!-- create vanted-jarfile -->
+        <jar destfile="release/mcccs.jar" filesetmanifest="mergewithoutmain">
+        	<fileset  dir="../MCCCS/bin"/>                
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+            </manifest>
+        </jar>
+    </target>
+</project>
