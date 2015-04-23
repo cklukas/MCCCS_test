@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import tools.ClassifierDisease_Process_16Bit;
 import tools.ClassifierFGBG_Process_16Bit;
-import tools.IO_MacroBot;
+import tools.IO_MCCCS;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.structures.ImageStack;
@@ -72,7 +72,7 @@ public class ArffSampleFileGenerator {
 					wait.add(BackgroundThreadDispatcher.addTask(() -> {
 						// Read data for Training
 							try {
-								IO_MacroBot io = new IO_MacroBot(f);
+								IO_MCCCS io = new IO_MCCCS(f);
 								
 								ImageStack[] isl = io.readTrainingData(false, f_isFGBG);
 								

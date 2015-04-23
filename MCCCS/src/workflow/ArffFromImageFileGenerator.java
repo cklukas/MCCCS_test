@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import tools.ARFFProcessor;
-import tools.IO_MacroBot;
+import tools.IO_MCCCS;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
@@ -54,7 +54,7 @@ public class ArffFromImageFileGenerator {
 				}
 				
 				for (File f : fl) {
-					IO_MacroBot io = new IO_MacroBot(f);
+					IO_MCCCS io = new IO_MCCCS(f);
 					ImageStack[] isl = io.readTestingData();
 					
 					if (Settings.debug_IO) {
@@ -72,7 +72,7 @@ public class ArffFromImageFileGenerator {
 					String[] split = name2.split("\\.");
 					String name = split[0];
 					String path = f.getPath();
-					ac.convertImagesToArff(isl[0], path, name, mask, false, false);
+					ac.convertImagesToArff(isl[0], path, name + "_" + Settings.numberOfClasses, mask, false, false);
 				}
 			}
 		}

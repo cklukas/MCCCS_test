@@ -29,7 +29,7 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 		ImageStack applyedM = applyMasks(is, masks, removeFromStack);
 		
 		// get fg & bg
-		ImageStack[] fgbg = getFGBG(applyedM);
+		ImageStack[] fgbg = getFGBG2(applyedM);
 		
 		// apply gt
 		ImageStack[] gtApplied = applyGTImages(fgbg, gt, false);
@@ -45,14 +45,13 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 			for (ImageStack s : gtApplied)
 				s.show("gtapplied");
 		} else {
-			while (masks.getStack().getSize()>0)
-			masks.getStack().deleteLastSlice();
+			while (masks.getStack().getSize() > 0)
+				masks.getStack().deleteLastSlice();
 			applyedM = null;
-			while (gt.getStack().getSize()>0)
+			while (gt.getStack().getSize() > 0)
 				gt.getStack().deleteLastSlice();
 		}
-		
-		ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, false, "label", false); // back => Float.MAX_VALUE
+		ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, true, "label", false); // back => Float.MAX_VALUE
 	}
 	
 	/**
@@ -63,7 +62,7 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 	 * @return
 	 */
 	private ImageStack[] applyGTImages(ImageStack[] fgbg, ImageStack gt, boolean removeFromStack) {
-		ImageStack fg = fgbg[1];
+		ImageStack fg = fgbg[0];
 		
 		if (Settings.debug_IO) {
 			fg.show("fg");
@@ -107,6 +106,21 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 			ImageProcessor bg = applyedM.getProcessor(i).duplicate();
 			bg.fill(applyedM.getProcessor(i + 1).convertToByteProcessor());
 			fgStack.addImage(labels[i], bg);
+			bgStack.addImage(labels[i + 1], applyedM.getProcessor(i + 1));
+		}
+		return new ImageStack[] { fgStack, bgStack };
+	}
+	
+	private ImageStack[] getFGBG2(ImageStack applyedM) {
+		ImageStack fgStack = new ImageStack();
+		ImageStack bgStack = new ImageStack();
+		
+		String[] labels = applyedM.getLabels();
+		
+		for (int i = 0; i < applyedM.size(); i += 2) {
+			// ImageProcessor bg = applyedM.getProcessor(i).duplicate();
+			// bg.fill(applyedM.getProcessor(i + 1).convertToByteProcessor());
+			fgStack.addImage(labels[i], applyedM.getProcessor(i));
 			bgStack.addImage(labels[i + 1], applyedM.getProcessor(i + 1));
 		}
 		return new ImageStack[] { fgStack, bgStack };

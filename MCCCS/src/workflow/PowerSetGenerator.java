@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import tools.IO_MacroBot;
+import tools.IO_MCCCS;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
@@ -46,15 +46,21 @@ public class PowerSetGenerator {
 				// do sth
 				for (File f : fl) {
 					// Read data for Training
-					IO_MacroBot io = new IO_MacroBot(f);
-					ImageStack[] isl = io.readTrainingData(false, true);
+					IO_MCCCS io = new IO_MCCCS(f);
+					ImageStack[] isl = io.readTrainingData(true, false);
 					
+					// load region of interest
 					if (roi == null)
-						roi = IO_MacroBot.readImageAbsPath("mask_0.png");
+						roi = IO_MCCCS.readImageAbsPath(f.getAbsolutePath() + File.separator + "mask_1.png");
+					
+					int count = 0;
+					// // save dt images as labels
+					// for (Image ii : isl[0].getImages())
+					// ii.saveToFile(f.getAbsolutePath() + File.separator + "label_" + count++ + ".png");
 					
 					Image img = process(isl[0]);
 					img = img.io().applyMask(roi).getImage();
-					img.saveToFile(f.getAbsolutePath() + File.separator + "label_0" + ".png");
+					img.saveToFile(f.getAbsolutePath() + File.separator + "label_" + count++ + ".png");
 					
 					isl[0].initLabels();
 					isl[0] = isl[0].getBinaryPowerSet(1);
@@ -62,7 +68,7 @@ public class PowerSetGenerator {
 					for (Image iii : isl[0].getImages()) {
 						String name = iii.getFileName();
 						iii = iii.io().applyMask(roi).getImage();
-						iii.saveToFile(f.getAbsolutePath() + File.separator + "label_" + name + ".png");
+						iii.saveToFile(f.getAbsolutePath() + File.separator + "label_" + count++ + ".png");
 					}
 					
 					if (Settings.debug_IO) {

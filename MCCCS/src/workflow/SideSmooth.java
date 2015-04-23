@@ -51,7 +51,9 @@ public class SideSmooth {
 				}
 				
 				ThreadSafeOptions resAll = new ThreadSafeOptions();
-				fl.parallelStream().forEach((f) -> {
+				Image all = null;
+				// fl.parallelStream().forEach((f) -> {
+				for (File f : fl) {
 					if (!f.exists()) {
 						System.err.println("File '" + f.getPath() + "' could not be found! Return Code 2");
 						System.exit(2);
@@ -68,33 +70,35 @@ public class SideSmooth {
 						PolynomialFitter pf_right = new PolynomialFitter(3);
 						for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
 							// scanline Left
-						scanLeftAndRight(img, bounds, pf_left, pf_right, y);
+							scanLeftAndRight(img, bounds, pf_left, pf_right, y);
+						}
+						Polynomial leftCurve = pf_left.getBestFit();
+						Polynomial rightCurve = pf_right.getBestFit();
+						ImageOperation resImg = new Image(i.getWidth(), i.getHeight(), new int[i.getWidth() * i.getHeight()]).io();
+						resImg = resImg.clearArea(0, 0, i.getWidth(), i.getHeight(), Settings.back);
+						ImageCanvas ic = resImg.canvas();
+						for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
+							int x0 = (int) Math.ceil(leftCurve.getY(y));
+							int x1 = (int) rightCurve.getY(y);
+							ic = ic.drawLine(x0, y, x1, y, Settings.foreground, 0, 1);
+						}
+						Image ri = ic.getImage();
+						all = i.io().or(ri, Settings.back).getImage();
+						// synchronized (resAll) {
+						// if (resAll.getParam(0, null) == null)
+						// resAll.setParam(0, ri.io());
+						// else
+						// resAll.setParam(0, ((ImageOperation) resAll.getParam(0, null)).or(ri, 0));
+						// }
+						ri.saveToFile(f.getParent() + File.separator
+								+ f.getName().substring(0, f.getName().lastIndexOf(".")) + "_smooth.png");
 					}
-					Polynomial leftCurve = pf_left.getBestFit();
-					Polynomial rightCurve = pf_right.getBestFit();
-					ImageOperation resImg = new Image(i.getWidth(), i.getHeight(), new int[i.getWidth() * i.getHeight()]).io();
-					resImg = resImg.clearArea(0, 0, i.getWidth(), i.getHeight(), Settings.back);
-					ImageCanvas ic = resImg.canvas();
-					for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
-						int x0 = (int) Math.ceil(leftCurve.getY(y));
-						int x1 = (int) rightCurve.getY(y);
-						ic = ic.drawLine(x0, y, x1, y, Settings.foreground, 0, 1);
-					}
-					Image ri = ic.getImage();
-					// ri = i.io().or(ri, Settings.back).getImage();
-					synchronized (resAll) {
-						if (resAll.getParam(0, null) == null)
-							resAll.setParam(0, ri.io());
-						else
-							resAll.setParam(0, ((ImageOperation) resAll.getParam(0, null)).or(ri, 0));
-					}
-					ri.saveToFile(f.getParent() + File.separator
-							+ f.getName().substring(0, f.getName().lastIndexOf(".")) + "_smooth.png");
 				}
-			}	);
-				synchronized (resAll) {
-					((ImageOperation) resAll.getParam(0, null)).getImage().saveToFile(a + "smooth_all.png");
-				}
+				all.saveToFile(a + "smooth_all.png");
+				// );
+				// synchronized (resAll) {
+				// ((ImageOperation) resAll.getParam(0, null)).getImage().saveToFile(a + "smooth_all.png");
+				// }
 			}
 		}
 	}
@@ -119,16 +123,17 @@ public class SideSmooth {
 			}, "scan left");
 			BackgroundThreadDispatcher.addTask(() -> {
 				for (int x = bounds.x + bounds.width; x >= bounds.x; x--) {
-					if (img[x][y] != Settings.back) {
-						pf_right.addPoint(y, x);
-						if (y < bounds.y + fromBorder) {
-							pf_right.addPoint(bounds.y - (y - bounds.y), x);
+					if (x < img.length && y < img[0].length)
+						if (img[x][y] != Settings.back) {
+							pf_right.addPoint(y, x);
+							if (y < bounds.y + fromBorder) {
+								pf_right.addPoint(bounds.y - (y - bounds.y), x);
+							}
+							if (y > bounds.y + bounds.height - fromBorder) {
+								pf_right.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
+							}
+							break;
 						}
-						if (y > bounds.y + bounds.height - fromBorder) {
-							pf_right.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
-						}
-						break;
-					}
 				}
 			}, "scan right");
 			BackgroundThreadDispatcher.waitFor(wait);

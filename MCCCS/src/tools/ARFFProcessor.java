@@ -44,12 +44,15 @@ public class ARFFProcessor {
 			boolean addOtherColorValuesFromRGBbands)
 			throws IOException {
 		
+		background = 0.0f;
+		
 		int numberOfClasses = inputImages.length;
 		LinkedList<float[][][]> cubes = new LinkedList<float[][][]>();
 		
-		for (int idx = 0; idx < numberOfClasses; idx++)
+		for (int idx = 0; idx < numberOfClasses; idx++) {
 			cubes.add(inputImages[idx].getFloatCube());
-		
+			// System.out.println(idx);
+		}
 		// inputImages[0].show("11");
 		// inputImages[1].show("2");
 		
@@ -145,7 +148,7 @@ public class ARFFProcessor {
 				int pos = xCoord + yCoord * width;
 				
 				if (addOtherColorValuesFromRGBbands) {
-					double scale = 1d; // in case of 14-bit => 64d;
+					double scale = 1d; // in case of 14-bit => 64d else 1d;
 					try {
 						double r = Double.parseDouble(colors[0]) / scale;
 						double g = Double.parseDouble(colors[1]) / scale;
@@ -183,9 +186,9 @@ public class ARFFProcessor {
 				
 				// mark in debug image
 				if (debug) {
-					for (int i = 0; i < 4; i++)
-						for (int j = 0; j < 4; j++)
-							debugSampleImage[new Integer(xCoord) + i][new Integer(yCoord) + j] = Color.RED.getRGB();
+					// for (int i = 0; i < 4; i++)
+					// for (int j = 0; j < 4; j++)
+					debugSampleImage[new Integer(xCoord)][new Integer(yCoord)] = Color.RED.getRGB();
 				}
 				sampleList.remove(randidx);
 				count++;
@@ -204,7 +207,7 @@ public class ARFFProcessor {
 		
 		sb.append("%");
 		
-		IO_MacroBot.write(path.getPath(), filename, sb.toString(), ".arff");
+		IO_MCCCS.write(path.getPath(), filename, sb.toString(), ".arff");
 	}
 	
 	private static String getSampleString(short[] vec_xyn, LinkedList<float[][][]> cubes, int bands) {
@@ -420,9 +423,9 @@ public class ARFFProcessor {
 					if (useArffClassInformation) {
 						String cl = s[s.length - 1];
 						if ("class0".equals(cl))
-							mask[x][y] = Settings.back;
-						else
 							mask[x][y] = Settings.foreground;
+						else
+							mask[x][y] = Settings.back;
 						
 					} else {
 						// last element defines class [0 ... n]

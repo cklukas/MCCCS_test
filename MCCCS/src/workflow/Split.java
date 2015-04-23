@@ -16,7 +16,7 @@ import de.ipk.ag_ba.image.structures.Image;
 /**
  * Splits leaves within image (objects which all reach a certain top-position and which at the same time
  * reach a certain lower-end position. Objects which don't 'touch' these virtual top and lower borders, which
- * are of less height, are removed. Then each object which fullfills these criteria, a new image with only
+ * are of less height, are removed. Then each object which full-fills these criteria, a new image with only
  * that specific object is created.
  * Input:
  * image file

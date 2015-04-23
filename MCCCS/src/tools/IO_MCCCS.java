@@ -22,18 +22,18 @@ import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
-public class IO_MacroBot {
+public class IO_MCCCS {
 	
 	File pathToTestingData;
 	
 	/**
 	 * Path to folder, should include /input, /masks and /groundtruth.
 	 */
-	public IO_MacroBot(File f) {
+	public IO_MCCCS(File f) {
 		this.pathToTestingData = f;
 	}
 	
-	public IO_MacroBot(String pathToTestingData) {
+	public IO_MCCCS(String pathToTestingData) {
 		this.pathToTestingData = new File(pathToTestingData);
 	}
 	
@@ -48,7 +48,7 @@ public class IO_MacroBot {
 				isl[2] = readImages(pathToTestingData, ReadMode.GROUNDTRUTH, Settings.numberOfClasses, ".png", false);
 		} else {
 			isl = new ImageStack[1];
-			isl[0] = readImages(pathToTestingData, ReadMode.GROUNDTRUTH_USER, Settings.numberOfClasses, ".png", true);
+			isl[0] = readImages(pathToTestingData, ReadMode.GROUNDTRUTH_USER, Settings.numberOfClasses, ".png", false);
 		}
 		
 		return isl;
@@ -95,7 +95,8 @@ public class IO_MacroBot {
 			// idxxxs = "0" + idxxxs;
 			try {
 				ImagePlus ip = null;
-				String pathOrURL = pathToTestingData.getAbsolutePath() + File.separator + hmap.get(numberOfFiles < 0 ? fnames.get(idxxx) : filename + idxxxs);
+				String fname = hmap.get(numberOfFiles < 0 ? fnames.get(idxxx) : filename + idxxxs);
+				String pathOrURL = pathToTestingData.getAbsolutePath() + File.separator + fname;
 				// load ROI mask from parent folder
 				if (r == ReadMode.MASKS && idxxx == 0) {
 					continue;
@@ -178,7 +179,7 @@ public class IO_MacroBot {
 		String getMode() {
 			switch (this) {
 				case GROUNDTRUTH_USER:
-					return "dt";
+					return "dt_";
 				case GROUNDTRUTH:
 					return "label_";
 				case IMAGES:

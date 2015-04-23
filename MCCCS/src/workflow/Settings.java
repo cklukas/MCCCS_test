@@ -18,7 +18,7 @@ public class Settings {
 	public static boolean debug_IO = false;
 	public static int numberOfChannels = 4;
 	public static int numberOfClasses = 2;
-	public static boolean print_IO = false;
+	public static boolean print_IO = true;
 	
 	public Settings() {
 		this(false);
