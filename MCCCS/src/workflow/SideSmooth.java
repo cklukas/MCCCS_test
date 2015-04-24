@@ -52,6 +52,7 @@ public class SideSmooth {
 				
 				ThreadSafeOptions resAll = new ThreadSafeOptions();
 				Image all = null;
+				boolean first = true;
 				// fl.parallelStream().forEach((f) -> {
 				for (File f : fl) {
 					if (!f.exists()) {
@@ -83,7 +84,11 @@ public class SideSmooth {
 							ic = ic.drawLine(x0, y, x1, y, Settings.foreground, 0, 1);
 						}
 						Image ri = ic.getImage();
-						all = i.io().or(ri, Settings.back).getImage();
+						if (first) {
+							all = ri;
+							first = false;
+						} else
+							all = all.io().or(ri, Settings.back).getImage();
 						// synchronized (resAll) {
 						// if (resAll.getParam(0, null) == null)
 						// resAll.setParam(0, ri.io());

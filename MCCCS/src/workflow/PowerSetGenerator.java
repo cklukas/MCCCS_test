@@ -55,8 +55,8 @@ public class PowerSetGenerator {
 					
 					int count = 0;
 					// // save dt images as labels
-					// for (Image ii : isl[0].getImages())
-					// ii.saveToFile(f.getAbsolutePath() + File.separator + "label_" + count++ + ".png");
+					for (Image ii : isl[0].getImages())
+						ii.saveToFile(f.getAbsolutePath() + File.separator + "label_" + count++ + ".png");
 					
 					Image img = process(isl[0]);
 					img = img.io().applyMask(roi).getImage();
