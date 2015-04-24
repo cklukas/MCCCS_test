@@ -1,20 +1,23 @@
 #!/bin/bash
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
-echo "°        Welcome to the 'Leaf Disease Classification System'        °"
+echo "°                          Welcome to the                           °"
+echo "°       'Multi Channel Classification and Clustering System'        °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
-echo "°          V1.0 developed in January and February 2015              °"
+echo "°          V1.0 developed in January till April 2015                °"
 echo "°          by the following members of the Research Group           °"
 echo "°                                                                   °"
-echo "°          - IMAGE ANALYSIS -                                       °"
+echo "°          - IMAGE ANALYSIS at IPK -                                °"
 echo "°                                                                   °"
-echo "°               Head of group:                                      °"
-echo "°                  Dr. Christian Klukas                             °"
+echo "°          Jean-Michel Pape and                                     °"
+echo "°          Dr. Christian Klukas (Head of group)                     °"
 echo "°                                                                   °"
-echo "°               Scientific Assistant:                               °"
-echo "°                  Jean-Michel Pape                                 °"
+echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
+echo "°                                                                   °"
+echo "°          Pipeline for for disease classification.                 °"
+echo "°          Implemented by Jean-Michel Pape                          °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
@@ -26,7 +29,8 @@ echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 # 1: path to the mcccs.jar
 # 2: path to the data-files
 # 3: number of procs
-if [ "$#" -ne 3 ]; then
+# 4: path to the model files
+if [ "$#" -ne 4 ]; then
     echo "Please supply the path to the mcccs.jar as parameter 1, the path to the data-files as parameter 2 and s-single-threaded, m-multi-threaded as parameter 3!"
 	exit 1
 fi
@@ -36,64 +40,9 @@ echo "prepare"
 source prepare.sh
 FIRST=yes
 echo Java command: $JAVA
-echo
-echo "Steps per directory:"
-echo "1. Generate Zero-Mask and PowerSet images from training ground-truth data files."
-echo "2. Generate ARFF files from training data." 
-echo "3. Create (first) or extend (following dirs) 'all_fbgb.arff' and 'all_disease.arff'."
-for dir in */;
-do
-	echo
-    dir=${dir%*/}
-	echo -n "Process directory '${dir}': "
-
-	echo "Delete files ..."
-	echo "rm -f ${dir}/*.arff"
-	rm -f ${dir}/*.arff
-	echo "rm -f ${dir}/foreground*"
-	rm -f ${dir}/foreground*
-	echo "rm -f ${dir}/label*"	
-	rm -f ${dir}/label*
-	echo "rm -f ${dir}/classified*"	
-	rm -f ${dir}/classified*
-	echo "rm -f ${dir}/quantified*"	
-	rm -f ${dir}/quantified*
-	echo "Finish deletion!"
-
-	echo -n "[1]"
-	#echo $JAVA.PowerSetGenerator 3 "${dir}"
-	$JAVA.PowerSetGenerator 3 "${dir}"
-	
-	echo -n "[2]"
-	$JAVA.ArffSampleFileGenerator 4 -2 1000 "${dir}"
-	$JAVA.ArffSampleFileGenerator 4 11 2000 "${dir}"
-		
-	echo -n "[3]"
-	if [ $FIRST=yes ]; then
-		# add complete file, including header
-		# echo "Add complete file to Arff."
-		cat "${dir}/fgbgTraining.arff" >> all_fgbg.arff
-		cat "${dir}/labelTraining.arff" >> all_label.arff
-	else
-		# ignore header
-		# echo "Add data without header file to Arff"
-		cat "${dir}/fgbgTraining.arff" | grep -v @ | grep -v "%"   >> all_fgbg.arff
-		cat "${dir}/labelTraining.arff"  | grep -v @ | grep -v "%"   >> all_label.arff
-	fi
-	FIRST=no
-done 
-echo
-echo
-echo "Steps to summarize data:"
-echo "1. Train FGBG classifier from all_fgbg.arff file."
-echo "2. Train Disease classifier from all_disease.arff file."
-echo "Summarize data:"
-echo -n "[1]"
-$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.RandomForest -- -I 100
-echo -n "[2]"
-$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_label.arff' -d label.model -W weka.classifiers.trees.RandomForest -- -I 100
-echo
-echo "Completed training."
+MODELPATH="../$4"
+echo "Path to model files:"
+echo "$MODELPATH"
 echo
 echo "Use model to predict result for data:"
 echo "1. Create .arff file for fgbg segmentation."
@@ -110,11 +59,16 @@ do
     dir=${dir%*/}
     	echo -n "Process directory '${dir}': "
 
+	cp -n "${dir}"/*red.tif "${dir}/channel_0.tif"
+	cp -n "${dir}"/*green.tif "${dir}/channel_1.tif"
+	cp -n "${dir}"/*blue.tif "${dir}/channel_2.tif"
+	cp -n "${dir}"/*uv.tif "${dir}/channel_3.tif"
+
 	echo -n "[0]"
 	$JAVA.ArffFromImageFileGenerator 4 2 "${dir}"
 
  	echo -n "[1]"
-	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized fgbg.model -classification -remove-old-class -o "${dir}/fgbgresult.arff" -c last
+	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized $MODELPATH/fgbg.model -classification -remove-old-class -o "${dir}/fgbgresult.arff" -c last
 
 	#create foreground png
 	cp "${dir}/channel_0.tif" "${dir}/fgbgresult.tif"
@@ -133,7 +87,7 @@ do
 
 	echo -n "[5]"
 	#$JAVA.ClassifyDisease ${dir}/foreground_
-	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
+	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized $MODELPATH/label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
 
 	echo -n "[6]"
 	cp ${dir}/foreground_roi_smooth_all.png "${dir}/labelresult.png"

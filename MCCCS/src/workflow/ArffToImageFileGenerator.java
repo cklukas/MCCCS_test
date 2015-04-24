@@ -50,7 +50,7 @@ public class ArffToImageFileGenerator {
 					String name2 = f.getName();
 					String[] split = name2.split("\\.");
 					String name = split[0];
-					ac.convertArffToImage(f.getParent(), name, mask, false, false);
+					ac.convertArffToImage(f.getParent(), name, mask, false, true, false);
 				}
 			}
 		}

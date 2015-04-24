@@ -40,6 +40,9 @@ public class ARFFProcessor {
 	 * @param calcAdditionalColorFeatures
 	 * @throws IOException
 	 */
+	
+	static double scale = 64d; // in case of 14-bit => 64d else 1d;
+	
 	public static void createTrainingDataSet(ImageStack[] inputImages, float background, File path, int samplesize, String filename, boolean debug, String id,
 			boolean addOtherColorValuesFromRGBbands)
 			throws IOException {
@@ -148,7 +151,6 @@ public class ARFFProcessor {
 				int pos = xCoord + yCoord * width;
 				
 				if (addOtherColorValuesFromRGBbands) {
-					double scale = 1d; // in case of 14-bit => 64d else 1d;
 					try {
 						double r = Double.parseDouble(colors[0]) / scale;
 						double g = Double.parseDouble(colors[1]) / scale;
@@ -322,10 +324,9 @@ public class ARFFProcessor {
 				for (int b = 0; b < bands; b++)
 					line += cubeSliceXY[b][x][y] + ",";
 				if (addOtherColorValuesFromRGBbands) {
-					double d = 1d; // 64d;
-					double r = cubeSliceXY[0][x][y] / d;
-					double g = cubeSliceXY[1][x][y] / d;
-					double b = cubeSliceXY[2][x][y] / d;
+					double r = cubeSliceXY[0][x][y] / scale;
+					double g = cubeSliceXY[1][x][y] / scale;
+					double b = cubeSliceXY[2][x][y] / scale;
 					
 					convert.RGBtoXYZ(r, g, b, xyz);
 					convert.XYZtoLAB(xyz, lab);
@@ -365,9 +366,15 @@ public class ARFFProcessor {
 	}
 	
 	/**
-	 * 
+	 * Default: Arff file has same size as foreground
+	 * => useArffClassInformation = false, useAll = false
+	 * FGBG conversion (only 2 classes, classifies whole image):
+	 * => useArffClassInformation = true, useAll =false
+	 * arff includes all pixels (more than foreground mask)
+	 * => useAll = true
 	 */
-	public void convertArffToImage(String parent, String name, Image mask_img, boolean useArffClassInformation, boolean debug) throws IOException {
+	public void convertArffToImage(String parent, String name, Image mask_img, boolean useArffClassInformation, boolean useAll, boolean debug)
+			throws IOException {
 		
 		ImagePlus ip = mask_img.getAsImagePlus();
 		ImageConverter ic = new ImageConverter(ip);
@@ -396,26 +403,33 @@ public class ARFFProcessor {
 			colors[idx++] = c.getRGB();
 		
 		boolean goToStart = false;
+		int savedX = 0;
+		int savedY = 0;
 		
 		out: for (int x = 0; x < mask_img.getWidth(); x++) {
 			for (int y = 0; y < mask_img.getHeight(); y++) {
+				
 				if (goToStart) {
-					x = 0;
-					y = 0;
+					x = savedX;
+					y = savedY;
 					goToStart = false;
 				}
-				if (mask[x][y] != Settings.back || useArffClassInformation) {
+				if ((mask[x][y] != Settings.back || useArffClassInformation) || useAll) {
 					String line = br.readLine();
-					// System.out.println(line);
 					// end of file ?
 					if (line == null)
 						break out;
 					if (line.contains("%"))
 						break out;
 					if (line.length() == 0) {
-						if (useArffClassInformation) {
-							// first ARFF file lines empty -> idicies [0,0]
+						// skip empty lines in arff file
+						if (useArffClassInformation)
+						{
 							goToStart = true;
+						} else {
+							goToStart = true;
+							savedX = x;
+							savedY = y;
 						}
 						continue;
 					}
@@ -429,7 +443,7 @@ public class ARFFProcessor {
 						
 					} else {
 						// last element defines class [0 ... n]
-						if (s.length > 0) {
+						if (s.length > 0 && mask[x][y] != Settings.back) {
 							int cls = Integer.parseInt(StringManipulationTools.getNumbersFromString(s[s.length - 1]));
 							mask[x][y] = colors[cls];
 						} else

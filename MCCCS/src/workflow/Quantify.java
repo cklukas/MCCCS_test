@@ -35,7 +35,7 @@ public class Quantify {
 				LinkedList<File> fl = new LinkedList<>();
 				String path = new File(a).getParent();
 				for (File f : new File(path).listFiles((fn) -> {
-					if (!fn.getName().endsWith("_cluster.png"))
+					if (!fn.getName().endsWith("_cluster.png") && !fn.getName().endsWith("classified.png"))
 						return false;
 					return fn.getName().startsWith(new File(a).getName());
 				})) {
