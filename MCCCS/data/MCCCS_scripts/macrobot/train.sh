@@ -35,6 +35,19 @@ if [ "$#" -ne 3 ]; then
 fi
 # stop in case of error:
 set -e
+#set path to preprocess (used for parallel processing)
+PRES="$(pwd)/preprocess.sh"
+echo "$PRES"
+if ! [[ "$(uname)" == CYGWIN* ]]
+then
+	chmod +x $PRES
+	chmod +x "prepare.sh"
+fi
+if [ "$(uname)" == "Darwin" ]; then
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+fi
 echo "prepare"
 source prepare.sh
 FIRST=yes
@@ -44,44 +57,11 @@ echo "Steps per directory:"
 echo "(a) Generate Zero-Mask and PowerSet images from training ground-truth data files."
 echo "(b) Generate ARFF files from training data." 
 echo "(c) Create (first) or extend (following dirs) 'all_fbgb.arff' and 'all_disease.arff'."
+echo
+find * -maxdepth 0 -type d | grep -F -v CVS | $par $PRES $2 {}
+echo
 for dir in */;
 do
-	echo
-    dir=${dir%*/}
-	echo -n "Process directory '${dir}': "
-
-	echo
-	echo -n "Delete files "
-	#echo "rm -f ${dir}/*.arff"
-	rm -f ${dir}/*.arff
-	echo -n "."
-	#echo "rm -f ${dir}/foreground*"
-	rm -f ${dir}/foreground*
-	echo -n "."
-	#echo "rm -f ${dir}/label*"	
-	rm -f ${dir}/label*
-	echo -n "."
-	#echo "rm -f ${dir}/classified*"	
-	rm -f ${dir}/classified*
-	echo -n "."
-	#echo "rm -f ${dir}/quantified*"	
-	rm -f ${dir}/quantified*
-	echo -n ". "
-	#echo "Finish deletion!"
-
-	#rename and copy
-	cp -n "${dir}"/*red.tif "${dir}/channel_0.tif"
-	cp -n "${dir}"/*green.tif "${dir}/channel_1.tif"
-	cp -n "${dir}"/*blue.tif "${dir}/channel_2.tif"
-	cp -n "${dir}"/*uv.tif "${dir}/channel_3.tif"
-
-	echo -n "[a]"
-	$JAVA.PowerSetGenerator 3 "${dir}"
-	
-	echo -n "[b]"
-	$JAVA.ArffSampleFileGenerator 4 -2 1000 "${dir}"
-	$JAVA.ArffSampleFileGenerator 4 11 2000 "${dir}"
-		
 	echo -n "[c]"
 	if [ $FIRST == "yes" ];
 	then
@@ -149,7 +129,6 @@ do
 	$JAVA.ArffFromImageFileGenerator 4 11 "${dir}"
 
 	echo -n "[g]"
-	#$JAVA.ClassifyDisease ${dir}/foreground_
 	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
 
 	echo -n "[h]"

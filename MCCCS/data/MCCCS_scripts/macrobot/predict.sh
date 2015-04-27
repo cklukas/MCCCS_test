@@ -36,10 +36,23 @@ if [ "$#" -ne 4 ]; then
 fi
 # stop in case of error:
 set -e
+#set path to preprocess (used for parallel processing)
+PREDICT="$(pwd)/predict_folder.sh"
+echo "$PREDICT"
+if ! [[ "$(uname)" == CYGWIN* ]]
+then
+	chmod +x $PREDICT
+	chmod +x "prepare.sh"
+fi
+if [ "$(uname)" == "Darwin" ]; then
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+fi
 echo "prepare"
 source prepare.sh
 echo Java command: $JAVA
-MODELPATH="../$4"
+export MODELPATH="../$4"
 echo "Path to model files:"
 echo "$MODELPATH"
 echo
@@ -54,57 +67,10 @@ echo "(g) Classify disease.arff."
 echo "(h) Create classification image."
 echo "(i) Quantify disease areas."
 echo
+find * -maxdepth 0 -type d | grep -F -v CVS | $par $PREDICT $2 {}
+echo -n "[i]"
 for dir in */;
 do
-	echo
-    dir=${dir%*/}
-    	echo -n "Process directory '${dir}': "
-
-	echo
-	echo "delete previous results: foreground*, *.arff, classified.png"
-	rm -f ${dir}/foreground*
-	rm -f ${dir}/*.arff
-	rm -f ${dir}/classified.png
-	echo
-
-	#rename and copy
-	cp -n "${dir}"/*red.tif "${dir}/channel_0.tif"
-	cp -n "${dir}"/*green.tif "${dir}/channel_1.tif"
-	cp -n "${dir}"/*blue.tif "${dir}/channel_2.tif"
-	cp -n "${dir}"/*uv.tif "${dir}/channel_3.tif"
-
-	echo -n "[a]"
-	$JAVA.ArffFromImageFileGenerator 4 2 "${dir}"
-
- 	echo -n "[b] "${dir}/${dir}_2.arff""
-	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized $MODELPATH/fgbg.model -classification -remove-old-class -o "${dir}/fgbgresult.arff" -c last
-
-	#create foreground png
-	cp "${dir}/channel_0.tif" "${dir}/fgbgresult.tif"
-	$JAVA.ApplyClass0ToImage "${dir}/fgbgresult.tif"
-	rm "${dir}/fgbgresult.tif"
-	
-	echo -n "[c]"
-	$JAVA.ApplyMask ${dir}/foreground.png ${dir}/roi.png
-
-	echo -n "[d]"
-	$JAVA.Split ${dir}/foreground_roi.png
-
-	echo -n "[e]"
-	$JAVA.SideSmooth ${dir}/foreground_roi_
-
-	echo -n "[f]"
-	$JAVA.ArffFromImageFileGenerator 4 11 "${dir}"
-
-	echo -n "[g]"
-	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized $MODELPATH/label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
-
-	echo -n "[h]"
-	cp ${dir}/foreground_roi_smooth_all.png "${dir}/labelresult.png"
-	$JAVA.ArffToImageFileGenerator 11 "${dir}/labelresult.png"
-	rm "${dir}/labelresult.png"
-
-	echo -n "[i]"
 	rm -f ${dir}/*_quantified.csv
 	$JAVA.Quantify ${dir}/classified.png
 	cat ${dir}/*_quantified.csv >> all_results.csv
