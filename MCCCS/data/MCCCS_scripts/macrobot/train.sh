@@ -1,20 +1,23 @@
 #!/bin/bash
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
-echo "°        Welcome to the 'Leaf Disease Classification System'        °"
+echo "°                          Welcome to the                           °"
+echo "°       'Multi Channel Classification and Clustering System'        °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
-echo "°          V1.0 developed in January and February 2015              °"
+echo "°          V1.0 developed in January till April 2015                °"
 echo "°          by the following members of the Research Group           °"
 echo "°                                                                   °"
-echo "°          - IMAGE ANALYSIS -                                       °"
+echo "°          - IMAGE ANALYSIS at IPK -                                °"
 echo "°                                                                   °"
-echo "°               Head of group:                                      °"
-echo "°                  Dr. Christian Klukas                             °"
+echo "°          Jean-Michel Pape and                                     °"
+echo "°          Dr. Christian Klukas (Head of group)                     °"
 echo "°                                                                   °"
-echo "°               Scientific Assistant:                               °"
-echo "°                  Jean-Michel Pape                                 °"
+echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
+echo "°                                                                   °"
+echo "°          Pipeline for for disease classification.                 °"
+echo "°          Implemented by Jean-Michel Pape                          °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
@@ -38,40 +41,51 @@ FIRST=yes
 echo Java command: $JAVA
 echo
 echo "Steps per directory:"
-echo "1. Generate Zero-Mask and PowerSet images from training ground-truth data files."
-echo "2. Generate ARFF files from training data." 
-echo "3. Create (first) or extend (following dirs) 'all_fbgb.arff' and 'all_disease.arff'."
+echo "(a) Generate Zero-Mask and PowerSet images from training ground-truth data files."
+echo "(b) Generate ARFF files from training data." 
+echo "(c) Create (first) or extend (following dirs) 'all_fbgb.arff' and 'all_disease.arff'."
 for dir in */;
 do
 	echo
     dir=${dir%*/}
 	echo -n "Process directory '${dir}': "
 
-	echo "Delete files ..."
-	echo "rm -f ${dir}/*.arff"
+	echo
+	echo -n "Delete files "
+	#echo "rm -f ${dir}/*.arff"
 	rm -f ${dir}/*.arff
-	echo "rm -f ${dir}/foreground*"
+	echo -n "."
+	#echo "rm -f ${dir}/foreground*"
 	rm -f ${dir}/foreground*
-	echo "rm -f ${dir}/label*"	
+	echo -n "."
+	#echo "rm -f ${dir}/label*"	
 	rm -f ${dir}/label*
-	echo "rm -f ${dir}/classified*"	
+	echo -n "."
+	#echo "rm -f ${dir}/classified*"	
 	rm -f ${dir}/classified*
-	echo "rm -f ${dir}/quantified*"	
+	echo -n "."
+	#echo "rm -f ${dir}/quantified*"	
 	rm -f ${dir}/quantified*
-	echo "Finish deletion!"
+	echo -n ". "
+	#echo "Finish deletion!"
 
-	echo -n "[1]"
-	#echo $JAVA.PowerSetGenerator 3 "${dir}"
+	#rename and copy
+	cp -n "${dir}"/*red.tif "${dir}/channel_0.tif"
+	cp -n "${dir}"/*green.tif "${dir}/channel_1.tif"
+	cp -n "${dir}"/*blue.tif "${dir}/channel_2.tif"
+	cp -n "${dir}"/*uv.tif "${dir}/channel_3.tif"
+
+	echo -n "[a]"
 	$JAVA.PowerSetGenerator 3 "${dir}"
 	
-	echo -n "[2]"
+	echo -n "[b]"
 	$JAVA.ArffSampleFileGenerator 4 -2 1000 "${dir}"
 	$JAVA.ArffSampleFileGenerator 4 11 2000 "${dir}"
 		
-	echo -n "[3]"
-	if [ $FIRST=yes ]; then
+	echo -n "[c]"
+	if [ $FIRST == "yes" ];
+	then
 		# add complete file, including header
-		# echo "Add complete file to Arff."
 		cat "${dir}/fgbgTraining.arff" >> all_fgbg.arff
 		cat "${dir}/labelTraining.arff" >> all_label.arff
 	else
@@ -84,36 +98,37 @@ do
 done 
 echo
 echo
-echo "Steps to summarize data:"
-echo "1. Train FGBG classifier from all_fgbg.arff file."
-echo "2. Train Disease classifier from all_disease.arff file."
+echo "Steps for classifier training:"
+echo "(a) Train FGBG classifier using all_fgbg.arff file."
+echo "(b) Train disease classifier using all_disease.arff file."
 echo "Summarize data:"
-echo -n "[1]"
+echo -n "[a]"
 $WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.RandomForest -- -I 100
-echo -n "[2]"
+echo -n "[b]"
 $WEKA weka.classifiers.meta.FilteredClassifier -t 'all_label.arff' -d label.model -W weka.classifiers.trees.RandomForest -- -I 100
 echo
 echo "Completed training."
 echo
 echo "Use model to predict result for data:"
-echo "1. Create .arff file for fgbg segmentation."
-echo "2. Classify fgbg.arff."
-echo "3. Split leaves."
-echo "4. Reconstruct leaf shape."
-echo "5. Create .arff for disease classification."
-echo "6. Classify disease.arff."
-echo "7. Quantify disease areas."
-echo "8. Transform result CSV file into column oriented CSV file."
+echo "(a) Create .arff file for fgbg segmentation."
+echo "(b) Classify foreground (fgbg.arff)."
+echo "(c) Create foreground image."
+echo "(d) Split leaves."
+echo "(e) Reconstruct leaf shape (side smooth)."
+echo "(f) Create .arff for disease classification."
+echo "(g) Classify disease.arff."
+echo "(h) Create classification image."
+echo "(i) Quantify disease areas."
 for dir in */;
 do
 	echo
     dir=${dir%*/}
     	echo -n "Process directory '${dir}': "
 
-	echo -n "[0]"
+	echo -n "[a]"
 	$JAVA.ArffFromImageFileGenerator 4 2 "${dir}"
 
- 	echo -n "[1]"
+ 	echo -n "[b]"
 	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized fgbg.model -classification -remove-old-class -o "${dir}/fgbgresult.arff" -c last
 
 	#create foreground png
@@ -121,42 +136,38 @@ do
 	$JAVA.ApplyClass0ToImage "${dir}/fgbgresult.tif"
 	rm "${dir}/fgbgresult.tif"
 	
-	echo -n "[2]"
-	$JAVA.ApplyMask ${dir}/foreground.png ${dir}/roi.png 
+	echo -n "[c]"
+	$JAVA.ApplyMask ${dir}/foreground.png ${dir}/roi.png
+
+	echo -n "[d]"
 	$JAVA.Split ${dir}/foreground_roi.png
 
-	echo -n "[3]"
+	echo -n "[e]"
 	$JAVA.SideSmooth ${dir}/foreground_roi_
 
-	echo -n "[4]"
+	echo -n "[f]"
 	$JAVA.ArffFromImageFileGenerator 4 11 "${dir}"
 
-	echo -n "[5]"
+	echo -n "[g]"
 	#$JAVA.ClassifyDisease ${dir}/foreground_
 	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
 
-	echo -n "[6]"
+	echo -n "[h]"
 	cp ${dir}/foreground_roi_smooth_all.png "${dir}/labelresult.png"
 	$JAVA.ArffToImageFileGenerator 11 "${dir}/labelresult.png"
 	rm "${dir}/labelresult.png"
 
-	echo -n "[7]"
+	echo -n "[i]"
 	rm -f ${dir}/*_quantified.csv
 	$JAVA.Quantify ${dir}/classified.png
 	cat ${dir}/*_quantified.csv >> all_results.csv
-
-	echo -n "[8]"
+done
+	echo
+	echo "Transform result CSV file into column oriented CSV file."
 	rm -f all_results.csv.transformed
 	$JAVA.TransformCSV all_results.csv
 	mv all_results.csv.transformed all_results.csv
-done
 echo
 echo "Processing finished:"
-echo "1. FGBG model is trained: "
-echo "      'fgbgClassifier.data'"
-echo "2. Disease identification model is trained:"
-echo "      'diseaseClassifier.data'"
-echo "3. Model has been applied to training data. Disease infection rate is calculated:"
-echo "      'all_results.csv'"
 echo
 echo READY

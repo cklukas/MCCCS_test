@@ -68,9 +68,16 @@ public class ArffFromImageFileGenerator {
 						mask = new Image(FileSystemHandler.getURL(file));
 					
 					ARFFProcessor ac = new ARFFProcessor();
-					String name2 = f.getName();
-					String[] split = name2.split("\\.");
-					String name = split[0];
+					
+					String name;
+					// remove file-ending if it is directory
+					if (!f.isDirectory()) {
+						String name2 = f.getName();
+						String[] split = name2.split("\\.");
+						name = split[0];
+					} else
+						name = f.getName();
+					
 					String path = f.getPath();
 					ac.convertImagesToArff(isl[0], path, name + "_" + Settings.numberOfClasses, mask, false, false);
 				}
