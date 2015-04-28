@@ -5,7 +5,7 @@ echo -n "[${dir}]"
 
 START=$(date +%s)
 
-echo
+#echo
 #echo "delete previous results: foreground*, *.arff, classified.png"
 rm -f ${dir}/foreground*
 rm -f ${dir}/*.arff
