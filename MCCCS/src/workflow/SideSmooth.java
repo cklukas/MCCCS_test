@@ -8,8 +8,8 @@ import java.util.LinkedList;
 import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
-import workflow.ext.PolynomialFitter;
-import workflow.ext.PolynomialFitter.Polynomial;
+import tools.PolynomialFitter;
+import tools.PolynomialFitter.Polynomial;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
 import de.ipk.ag_ba.image.operation.ImageOperation;
