@@ -518,14 +518,7 @@ public class ARFFProcessor {
 	}
 	
 	/**
-	 * @param grayScaleFromProbability
-	 * @param parent
-	 * @param name
-	 * @param mask_img
-	 * @param useArffClassInformation
-	 * @param useAll
-	 * @param debug
-	 * @throws IOException
+	 * Creates grayscale image by using class probabilities (useAll = true => use all information of arff file, ignores mask)
 	 */
 	public void convertArffToImageMultiLabel(String parent, String name, Image mask_img, boolean useAll, boolean debug)
 			throws IOException {
