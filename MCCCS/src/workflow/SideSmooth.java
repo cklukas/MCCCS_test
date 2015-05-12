@@ -95,8 +95,8 @@ public class SideSmooth {
 						// else
 						// resAll.setParam(0, ((ImageOperation) resAll.getParam(0, null)).or(ri, 0));
 						// }
-						ri.saveToFile(f.getParent() + File.separator
-								+ f.getName().substring(0, f.getName().lastIndexOf(".")) + "_smooth.png");
+						// ri.saveToFile(f.getParent() + File.separator
+						// + f.getName().substring(0, f.getName().lastIndexOf(".")) + "_smooth.png");
 					}
 				}
 				all.saveToFile(a + "smooth_all.png");
