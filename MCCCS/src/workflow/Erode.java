@@ -8,7 +8,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * This command combines three images 'channel_0, channel_1, channel_2' (0 = red, 1 = green, 2 = blue) to an RGB composite image.
+ * This command performs the erode operation on a given input image (black pixels will be regarded as foreground, white as background).
  * 
  * @author Jean-Michel Pape
  */
