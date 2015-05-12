@@ -67,8 +67,8 @@ public class SideSmooth {
 						}
 						int[][] img = i.getAs2A();
 						Rectangle bounds = i.io().getBoundingBox().getBounds();
-						PolynomialFitter pf_left = new PolynomialFitter(3);
-						PolynomialFitter pf_right = new PolynomialFitter(3);
+						PolynomialFitter pf_left = new PolynomialFitter(4);
+						PolynomialFitter pf_right = new PolynomialFitter(4);
 						for (int y = bounds.y; y < bounds.y + bounds.height; y++) {
 							// scanline Left
 							scanLeftAndRight(img, bounds, pf_left, pf_right, y);
