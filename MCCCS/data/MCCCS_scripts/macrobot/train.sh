@@ -83,7 +83,7 @@ echo "(a) Train FGBG classifier using all_fgbg.arff file."
 echo "(b) Train disease classifier using all_disease.arff file."
 echo "Summarize data:"
 echo -n "[a]"
-$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.RandomForest -- -I 100
+$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.RandomForest -- -I 200
 echo -n "[b]"
 $WEKA weka.classifiers.meta.FilteredClassifier -t 'all_label.arff' -d label.model -W weka.classifiers.trees.RandomForest -- -I 100
 echo
@@ -92,7 +92,7 @@ echo
 echo "Use model to predict result for data:"
 echo "(a) Create .arff file for fgbg segmentation."
 echo "(b) Classify foreground (fgbg.arff)."
-echo "(c) Create foreground image."
+echo "(c) Create foreground image (and composite if possible)."
 echo "(d) Split leaves."
 echo "(e) Reconstruct leaf shape (side smooth)."
 echo "(f) Create .arff for disease classification."
@@ -121,19 +121,20 @@ do
 
 	echo -n "[d]"
 	$JAVA.Split ${dir}/foreground_roi.png
+	$JAVA.MakeRGBComposite ${dir}
 
 	echo -n "[e]"
 	$JAVA.SideSmooth ${dir}/foreground_roi_
 
 	echo -n "[f]"
-	$JAVA.ArffFromImageFileGenerator 4 11 "${dir}"
+	$JAVA.ArffFromImageFileGenerator 4 3 "${dir}"
 
 	echo -n "[g]"
-	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
+	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_3.arff" -serialized label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
 
 	echo -n "[h]"
 	cp ${dir}/foreground_roi_smooth_all.png "${dir}/labelresult.png"
-	$JAVA.ArffToImageFileGenerator 11 "${dir}/labelresult.png"
+	$JAVA.ArffToImageFileGenerator 3 "${dir}/labelresult.png"
 	rm "${dir}/labelresult.png"
 
 	echo -n "[i]"

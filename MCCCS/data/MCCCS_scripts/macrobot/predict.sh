@@ -69,12 +69,12 @@ echo "(i) Quantify disease areas."
 echo
 find * -maxdepth 0 -type d | grep -F -v CVS | $par $PREDICT $2 {}
 echo -n "[i]"
-for dir in */;
-do
-	rm -f ${dir}/*_quantified.csv
-	$JAVA.Quantify ${dir}/classified.png
-	cat ${dir}/*_quantified.csv >> all_results.csv
-done
+#for dir in */;
+#do
+#	rm -f ${dir}/*_quantified.csv
+#	$JAVA.Quantify ${dir}/classified.png
+#	cat ${dir}/*_quantified.csv >> all_results.csv
+#done
 	echo "Transform result CSV file into column oriented CSV file."
 	rm -f all_results.csv.transformed
 	$JAVA.TransformCSV all_results.csv

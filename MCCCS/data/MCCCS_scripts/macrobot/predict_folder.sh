@@ -10,6 +10,8 @@ START=$(date +%s)
 rm -f ${dir}/foreground*
 rm -f ${dir}/*.arff
 rm -f ${dir}/classified.png
+rm -f ${dir}/channel_*
+rm -f ${dir}/foreground_*
 #echo
 
 #rename and copy
@@ -39,21 +41,40 @@ $JAVA.Split ${dir}/foreground_roi.png
 echo -n "[e]"
 $JAVA.SideSmooth ${dir}/foreground_roi_
 
+#erode foreground
+echo -n "[.]"
+$JAVA.Erode ${dir}/foreground_roi_smooth_all.png
+
 echo -n "[f]"
-$JAVA.ArffFromImageFileGenerator 4 11 "${dir}"
+$JAVA.ArffFromImageFileGenerator 4 3 "${dir}"
 
 echo -n "[g]"
-$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_11.arff" -serialized $MODELPATH/label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
+$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_3.arff" -serialized $MODELPATH/label.model -classification -remove-old-class -o "${dir}/labelresult.arff" -c last
 
 echo -n "[h]"
 cp ${dir}/foreground_roi_smooth_all.png "${dir}/labelresult.png"
-$JAVA.ArffToImageFileGenerator 11 "${dir}/labelresult.png"
+$JAVA.ArffToImageFileGenerator 3 "${dir}/labelresult.png"
 rm "${dir}/labelresult.png"
 
+#create composite image (RGB)
+$JAVA.MakeRGBComposite ${dir}
+
+#split classified
+$JAVA.Split ${dir}/classified.png
+
+sleep 10s
+
 echo -n "[i]"
-rm -f ${dir}/*_quantified.csv
-$JAVA.Quantify ${dir}/classified.png
+#rm -f ${dir}/*_quantified.csv
+$JAVA.Quantify ${dir}/classified_*
 cat ${dir}/*_quantified.csv >> all_results.csv
+
+#echo "delete temporary results"
+rm -f ${dir}/foreground*
+rm -f ${dir}/*.arff
+rm -f ${dir}/*.csv
+rm -f ${dir}/channel_*
+rm -f ${dir}/foreground_*
 
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)

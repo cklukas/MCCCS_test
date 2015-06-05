@@ -37,9 +37,19 @@ cp -n "${dir}"/*uv.tif "${dir}/channel_3.tif"
 echo -n "[a]"
 $JAVA.PowerSetGenerator 3 "${dir}"
 
+rm -f ${dir}/label_2*
+rm -f ${dir}/label_4*
+rm -f ${dir}/label_5*
+rm -f ${dir}/label_6*
+rm -f ${dir}/label_7*
+rm -f ${dir}/label_8*
+rm -f ${dir}/label_9*
+rm -f ${dir}/label_10*
+mv ${dir}/label_3.png ${dir}/label_2.png
+
 echo -n "[b]"
-$JAVA.ArffSampleFileGenerator 4 -2 1000 "${dir}"
-$JAVA.ArffSampleFileGenerator 4 11 2000 "${dir}"
+$JAVA.ArffSampleFileGenerator 4 -2 5000 "${dir}"
+$JAVA.ArffSampleFileGenerator 4 3 2000 "${dir}"
 
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
