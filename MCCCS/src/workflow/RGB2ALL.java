@@ -1,12 +1,16 @@
 package workflow;
 
+import ij.ImagePlus;
+import ij.process.FloatProcessor;
+
 import java.io.File;
 import java.io.IOException;
 
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
-import de.ipk.ag_ba.image.operation.channels.Channel;
-import de.ipk.ag_ba.image.operation.channels.ChannelProcessing;
+import colors.ChannelProcessingExt;
+import colors.ColorSpaceExt;
+import colors.RgbColorSpaceExt;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
@@ -16,7 +20,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author Christian Klukas
  */
 public class RGB2ALL {
-
+	
 	public static void main(String[] args) throws IOException, Exception {
 		{
 			new Settings();
@@ -33,71 +37,72 @@ public class RGB2ALL {
 				System.err.println("File RGB - R '" + f_r.getName()
 						+ "' could not be found! Return Code 2");
 				System.exit(2);
-			} else if (!f_g.exists()) {
-				System.err.println("File RGB - G '" + f_g.getName()
-						+ "' could not be found! Return Code 2");
-				System.exit(2);
-			} else if (!f_b.exists()) {
-				System.err.println("File RGB - B '" + f_b.getName()
-						+ "' could not be found! Return Code 2");
-				System.exit(2);
-			} else {
-				Image r = new Image(FileSystemHandler.getURL(f_r));
-				Image g = new Image(FileSystemHandler.getURL(f_g));
-				Image b = new Image(FileSystemHandler.getURL(f_b));
-				float divistorFor8bitRangeTarget = (float) (Math.pow(2,
-						Float.parseFloat(args[3])) / 256);
-				ChannelProcessing cp = new ChannelProcessing(r.getAs1float(),
-						g.getAs1float(), b.getAs1float(), r.getWidth(),
-						r.getHeight(), divistorFor8bitRangeTarget);
-				cp.get(Channel.XYZ_X)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_xyz_x.tif");
-				cp.get(Channel.XYZ_Y)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_xyz_y.tif");
-				cp.get(Channel.XYZ_Z)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_xyz_z.tif");
-
-				cp.get(Channel.HSV_H)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_hsv_h.tif");
-				cp.get(Channel.HSV_S)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_hsv_s.tif");
-				cp.get(Channel.HSV_V)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_hsv_v.tif");
-
-				cp.get(Channel.LAB_L)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_lab_l.tif");
-				cp.get(Channel.LAB_A)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_lab_a.tif");
-				cp.get(Channel.LAB_B)
-						.getImage()
-						.saveToFile(
-								f_r.getParent() + File.separator
-										+ "channel_lab_b.tif");
+			} else
+				if (!f_g.exists()) {
+					System.err.println("File RGB - G '" + f_g.getName()
+							+ "' could not be found! Return Code 2");
+					System.exit(2);
+				} else
+					if (!f_b.exists()) {
+						System.err.println("File RGB - B '" + f_b.getName()
+								+ "' could not be found! Return Code 2");
+						System.exit(2);
+					} else {
+						// SystemAnalysis.simulateHeadless = false;
+						Image r = new Image(FileSystemHandler.getURL(f_r));
+						Image g = new Image(FileSystemHandler.getURL(f_g));
+						Image b = new Image(FileSystemHandler.getURL(f_b));
+						float divistorFor8bitRangeTarget = (float) (Math.pow(2,
+								Float.parseFloat(args[3])) / 256);
+						float[] r01 = getFloat(r);
+						float[] g01 = getFloat(g);
+						float[] b01 = getFloat(b);
+						for (int idx = 0; idx < r01.length; idx++) {
+							r01[idx] = r01[idx] / divistorFor8bitRangeTarget / 255f;
+							g01[idx] = g01[idx] / divistorFor8bitRangeTarget / 255f;
+							b01[idx] = b01[idx] / divistorFor8bitRangeTarget / 255f;
+						}
+						
+						for (RgbColorSpaceExt rgb : RgbColorSpaceExt.values()) {
+							if (rgb != RgbColorSpaceExt.AdobeRGB_D65)
+								continue;
+							for (ColorSpaceExt cs : ColorSpaceExt.values()) {
+								// if (cs != ColorSpaceExt.Lab)
+								// continue;
+								// if (ce != ChannelExt.Lab_L)
+								// continue;
+								float[] rc01 = new float[r01.length];
+								System.arraycopy(r01, 0, rc01, 0, r01.length);
+								
+								float[] gc01 = new float[g01.length];
+								System.arraycopy(g01, 0, gc01, 0, g01.length);
+								
+								float[] bc01 = new float[b01.length];
+								System.arraycopy(b01, 0, bc01, 0, b01.length);
+								
+								ChannelProcessingExt cpe = new ChannelProcessingExt(r.getWidth(), r.getHeight(), rc01, gc01, bc01);
+								int idx = 0;
+								for (ImagePlus ip : cpe.getImage(rgb, cs)) {
+									new Image(ip).saveToFile(
+											f_r.getParent() + File.separator
+													+ "channel_" + rgb.getID() + "_" + cs.getChannels()[idx++].getID() + ".tif");
+								}
+							}
+						}
+					}
+		}
+	}
+	
+	private static float[] getFloat(Image r) {
+		if (r.getAsImagePlus().getProcessor() instanceof FloatProcessor)
+			return r.getAs1float();
+		else {
+			int[] inta = r.getAs1Ar();
+			float[] res = new float[inta.length];
+			for (int i = 0; i < inta.length; i++) {
+				res[i] = inta[i];
 			}
+			return res;
 		}
 	}
 }
