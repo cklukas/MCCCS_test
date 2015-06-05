@@ -48,7 +48,7 @@ public class TransformCSV {
 					tf.clear();
 					
 					TextFile transformed = new TextFile();
-					transformed.add("File\t" + StringManipulationTools.getStringList(globalColumnSet, "\t"));
+					transformed.add("Filepath\t" + StringManipulationTools.getStringList(globalColumnSet, "\t"));
 					for (String file : values.keySet()) {
 						StringBuilder rowContent = new StringBuilder();
 						rowContent.append(file);

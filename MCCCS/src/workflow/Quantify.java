@@ -35,7 +35,7 @@ public class Quantify {
 				LinkedList<File> fl = new LinkedList<>();
 				String path = new File(a).getParent();
 				for (File f : new File(path).listFiles((fn) -> {
-					if (!fn.getName().endsWith("_cluster.png") && !fn.getName().startsWith("classified") && !fn.getName().startsWith("cluster"))
+					if (!fn.getName().endsWith("_cluster.png") && !fn.getName().startsWith("classified_") && !fn.getName().startsWith("cluster"))
 						return false;
 					return fn.getName().startsWith(new File(a).getName());
 				})) {
@@ -68,10 +68,10 @@ public class Quantify {
 											}
 										}
 										TextFile tf = new TextFile();
-										tf.add(f.getParent() + "_" + f.getName() + "\t" + "leafarea" + "\t" + fgArea);
+										tf.add(f.getParent() + File.separator + f.getName() + "\t" + "leafarea_pixel" + "\t" + fgArea);
 										for (Integer symp : diseaseSymptomId2Area.keySet()) {
 											String colorName = AttributeHelper.getColorName(new Color(symp));
-											tf.add(f.getParent() + "_" + f.getName() + "\t" + "class_area_percent_" + colorName + "\t" + 100d
+											tf.add(f.getParent() + File.separator + f.getName() + "\t" + "class_area_percent_" + colorName + "\t" + 100d
 													* diseaseSymptomId2Area.get(symp)
 													/ fgArea);
 										}
