@@ -13,12 +13,17 @@ public class ChannelProcessingExt {
 	private int w;
 	private int h;
 	
-	public ChannelProcessingExt(int w, int h, float[] r01, float[] g01, float[] b01) {
+	public ChannelProcessingExt(int w, int h, float[] rs01, float[] gs01, float[] bs01) {
 		this.w = w;
 		this.h = h;
-		this.r01 = r01;
-		this.g01 = g01;
-		this.b01 = b01;
+		r01 = new float[rs01.length];
+		System.arraycopy(rs01, 0, r01, 0, rs01.length);
+		
+		g01 = new float[gs01.length];
+		System.arraycopy(gs01, 0, g01, 0, gs01.length);
+		
+		b01 = new float[bs01.length];
+		System.arraycopy(bs01, 0, b01, 0, bs01.length);
 	}
 	
 	public ImagePlus[] getImage(RgbColorSpaceExt rgbSourceColorSpace, ColorSpaceExt colorSpaceExt) {
