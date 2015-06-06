@@ -64,8 +64,8 @@ public class RGB2ALL {
 						}
 						
 						for (RgbColorSpaceExt rgb : RgbColorSpaceExt.values()) {
-							if (rgb != RgbColorSpaceExt.AdobeRGB_D65)
-								continue;
+							// if (rgb != RgbColorSpaceExt.AdobeRGB_D65)
+							// continue;
 							for (ColorSpaceExt cs : ColorSpaceExt.values()) {
 								// if (cs != ColorSpaceExt.Lab)
 								// continue;
@@ -85,7 +85,7 @@ public class RGB2ALL {
 								for (ImagePlus ip : cpe.getImage(rgb, cs)) {
 									new Image(ip).saveToFile(
 											f_r.getParent() + File.separator
-													+ "channel_" + rgb.getID() + "_" + cs.getChannels()[idx++].getID() + ".tif");
+													+ "channel_" + cs.getChannels()[idx++].getID() + "_" + rgb.getID() + ".tif");
 								}
 							}
 						}

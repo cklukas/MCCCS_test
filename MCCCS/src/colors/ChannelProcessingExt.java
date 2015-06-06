@@ -23,7 +23,7 @@ public class ChannelProcessingExt {
 	
 	public ImagePlus[] getImage(RgbColorSpaceExt rgbSourceColorSpace, ColorSpaceExt colorSpaceExt) {
 		Color_Transformer_2 ct = new Color_Transformer_2();
-		ct.setUp(rgbSourceColorSpace.getID(), colorSpaceExt.getID(), rgbSourceColorSpace.getWhitePoint(),
+		ct.setUp(rgbSourceColorSpace.getID(), colorSpaceExt.getID(),
 				w, h, r01, g01, b01);
 		switch (colorSpaceExt) {
 			case AC1C2:

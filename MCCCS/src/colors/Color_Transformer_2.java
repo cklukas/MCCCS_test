@@ -56,10 +56,9 @@ public class Color_Transformer_2 implements PlugInFilter {
 	/**
 	 * @author klukas
 	 */
-	public void setUp(String RGBcolourspace, String targetColorSpace, float[] Lwhite, int w, int h, float[] r01, float[] g01, float[] b01) {
+	public void setUp(String RGBcolourspace, String targetColorSpace, int w, int h, float[] r01, float[] g01, float[] b01) {
 		this.RGBcolourspace = RGBcolourspace;
 		this.colourspace = targetColorSpace;
-		this.Lwhite = Lwhite;
 		width = w;
 		height = h;
 		size = width * height;
