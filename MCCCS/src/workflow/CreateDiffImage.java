@@ -51,15 +51,18 @@ public class CreateDiffImage {
 						}
 						int[] out = new int[gta.length];
 						for (int i = 0; i < gta.length; i++) {
-							boolean gt_fore = gta[i] != Settings.back;
-							boolean pr_fore = pra[i] != Settings.back;
-							if (gt_fore == pr_fore) {
-								out[i] = Settings.foreground;
+							boolean gt_fore = gta[i] != Settings.back; // one of these two is wrong..
+							boolean pr_fore = pra[i] != Settings.back; // hence the strange logic in the following
+							if (gt_fore && gt_fore == pr_fore) {
+								out[i] = Color.BLUE.getRGB();// Settings.foreground;
 							} else {
 								if (pr_fore)
-									out[i] = Color.RED.getRGB();
+									out[i] = Settings.foreground;// Color.RED.getRGB();
 								else
-									out[i] = Color.BLUE.getRGB();
+									if (gt_fore)
+										out[i] = Settings.back;// Color.BLUE.getRGB();
+									else
+										out[i] = Color.RED.getRGB();// Color.ORANGE.getRGB();
 							}
 						}
 						new Image(gt.getWidth(), gt.getHeight(), out).saveToFile(f_out.getPath());

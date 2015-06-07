@@ -23,7 +23,7 @@ public class Quantify {
 	
 	public static void main(String[] args) throws Exception {
 		{
-			new Settings(true);
+			new Settings(false);
 		}
 		if (args == null || args.length == 0) {
 			System.err.println("No filenames provided as parameters! Return Code 1");
@@ -68,7 +68,7 @@ public class Quantify {
 											}
 										}
 										TextFile tf = new TextFile();
-										tf.add(f.getParent() + File.separator + f.getName() + "\t" + "leafarea_pixel" + "\t" + fgArea);
+										tf.add(f.getParent() + File.separator + f.getName() + "\t" + "foreground_area_pixel" + "\t" + fgArea);
 										for (Integer symp : diseaseSymptomId2Area.keySet()) {
 											String colorName = AttributeHelper.getColorName(new Color(symp));
 											tf.add(f.getParent() + File.separator + f.getName() + "\t" + "class_area_percent_" + colorName + "\t" + 100d

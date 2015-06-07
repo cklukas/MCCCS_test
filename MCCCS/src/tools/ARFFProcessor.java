@@ -48,7 +48,7 @@ public class ARFFProcessor {
 			boolean debug, String id, boolean addOtherColorValuesFromRGBbands)
 			throws IOException {
 		
-		background = 0.0f;
+		// background = 0.0f;
 		
 		int numberOfClasses = inputImages.length;
 		LinkedList<float[][][]> cubes = new LinkedList<float[][][]>();
@@ -422,7 +422,18 @@ public class ARFFProcessor {
 		
 		int[][] mask = iii.getAs2A();
 		
-		FileReader fr = new FileReader(parent + "/" + name + ".arff");
+		String fn = parent + "/" + name + ".arff";
+		File f = new File(fn);
+		if (!f.exists()) {
+			System.err.println("Error: File '" + fn + "' does not exist! Return 1");
+			System.exit(1);
+		}
+		if (!f.canRead()) {
+			System.err.println("Error: Can't read file '" + fn + "'! Return 2");
+			System.exit(2);
+		}
+		// System.out.println("INFO: Try to read file '" + fn + "'... (folder? " + f.getAbsolutePath() + ")");
+		FileReader fr = new FileReader(f);
 		BufferedReader br = new BufferedReader(fr);
 		
 		// skip header

@@ -23,21 +23,21 @@ public class ArffSampleFileGenerator {
 		{
 			new Settings();
 		}
-		if (args == null || args.length < 4) {
+		if (args == null || args.length < 3) { // [channel-count],
 			System.err
-					.println("No parameter for [channel-count], [[-]class-count, negative for FGBG separation], [sample-size] and / or no [filenames] provided as parameters! Return Code 1");
+					.println("No parameter for [[-]class-count, negative for FGBG separation], [sample-size] and / or no [filenames] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			int parmCount = 0;
 			boolean isFGBG = true;
 			for (String a : args) {
-				if (parmCount == 0) {
-					Settings.numberOfChannels = Integer.parseInt(a);
-					parmCount++;
-					continue;
-				}
+				// if (parmCount == 0) {
+				// Settings.numberOfChannels = Integer.parseInt(a);
+				// parmCount++;
+				// continue;
+				// }
 				
-				if (parmCount == 1) {
+				if (parmCount == 0) {
 					Settings.numberOfClasses = Math.abs(Integer.parseInt(a));
 					if (Integer.parseInt(a) < 0)
 						isFGBG = true;
@@ -48,7 +48,7 @@ public class ArffSampleFileGenerator {
 					continue;
 				}
 				
-				if (parmCount == 2) {
+				if (parmCount == 1) {
 					Settings.sampleSize = Integer.parseInt(a);
 					parmCount++;
 					continue;

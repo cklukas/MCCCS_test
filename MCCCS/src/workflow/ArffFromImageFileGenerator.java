@@ -22,21 +22,21 @@ public class ArffFromImageFileGenerator {
 		{
 			new Settings(true);
 		}
-		if (args == null || args.length < 2) {
-			System.err.println("No parameter for [channel-count], [class-count] and / or no [filenames] provided as parameters! Return Code 1");
+		if (args == null || args.length < 1) { // [channel-count],
+			System.err.println("No parameter for [class-count] and / or no [filenames] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
-			int parmCount = 0;
+			int parmIndex = 0;
 			for (String a : args) {
-				if (parmCount == 0) {
-					Settings.numberOfChannels = Integer.parseInt(a);
-					parmCount++;
-					continue;
-				}
+				// if (parmCount == 0) {
+				// // Settings.numberOfChannels = Integer.parseInt(a);
+				// parmCount++;
+				// continue;
+				// }
 				
-				if (parmCount == 1) {
+				if (parmIndex == 0) {
 					Settings.numberOfClasses = Math.abs(Integer.parseInt(a));
-					parmCount++;
+					parmIndex++;
 					continue;
 				}
 				
