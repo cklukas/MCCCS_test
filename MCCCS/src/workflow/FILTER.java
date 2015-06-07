@@ -22,6 +22,10 @@ public class FILTER {
 			new Settings(true);
 		}
 		if (args == null || args.length != 5) {
+			if (args != null) {
+				for (int pi = 0; pi < args.length; pi++)
+					System.out.println("param " + pi + ": '" + args[pi] + "'");
+			}
 			System.err
 					.println("First parameter 'input image', second parameter 'output image', third parameter 'int parameter for opertion', fourth 'double param', fifth parameter 'operation mode'! Return Code 1");
 			System.out.println("Operation modes: " + StringManipulationTools.getStringList(ImageFeatureExtraction.FeatureMode.values(), ", "));

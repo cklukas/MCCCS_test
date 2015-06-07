@@ -9,9 +9,9 @@ import de.ipk.ag_ba.image.operation.GrayscaleMode;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * SplitRGB
- * input: RGB image file
- * output:channel0.png, channel1.png, channel2.png
+ * ThresholdGTforFGBG
+ * input: colored ground truth image
+ * output:mask_1.png, mask_2.png (forground and background mask images)
  * 
  * @author Jean-Michel Pape, Christian Klukas
  */

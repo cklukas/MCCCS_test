@@ -6,6 +6,7 @@ import ij.process.FloatProcessor;
 import java.io.File;
 import java.io.IOException;
 
+import org.StringManipulationTools;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import colors.ChannelProcessingExt;
@@ -106,7 +107,10 @@ public class RGB2ALL {
 							for (ImagePlus ip : cpe.getImage(rgb, cs)) {
 								new Image(ip).saveToFile(
 										f_r.getParent() + File.separator
-												+ "channel_" + cs.getChannels()[idx++].getID() + "_" + rgb.getID() + ".tif");
+												+ "channel_" +
+												StringManipulationTools.stringReplace(cs.getChannels()[idx++].getID(), " ", "-")
+												+ "_" +
+												StringManipulationTools.stringReplace(rgb.getID(), " ", "-") + ".tif");
 							}
 						}
 					}
