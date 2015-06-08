@@ -20,13 +20,19 @@ public class ArffToProbabilityImageFileGenerator {
 			new Settings(true);
 		}
 		if (args == null || args.length < 2) {
-			System.err.println("No parameter for [channel-count] and / or no [filenames] provided as parameters! Return Code 1");
+			System.err
+					.println("No parameter for [channel-count (png output), -channel-count (negative for float tiff output)] and / or no [filenames] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			int parmCount = 0;
+			boolean floatOut = false;
 			for (String a : args) {
 				if (parmCount == 0) {
 					Settings.numberOfClasses = Integer.parseInt(a);
+					if (Settings.numberOfClasses < 0) {
+						Settings.numberOfClasses = -Settings.numberOfClasses;
+						floatOut = true;
+					}
 					parmCount++;
 					continue;
 				}
@@ -50,7 +56,10 @@ public class ArffToProbabilityImageFileGenerator {
 					String name2 = f.getName();
 					String[] split = name2.split("\\.");
 					String name = split[0];
-					ac.convertArffToImageMultiLabel(f.getParent(), name, mask, true, false);
+					if (floatOut)
+						ac.convertArffToImageMultiLabelFloatImage(f.getParent(), mask.getWidth(), mask.getHeight(), name, false);
+					else
+						ac.convertArffToImageMultiLabel(f.getParent(), name, mask, true, false);
 				}
 			}
 		}
