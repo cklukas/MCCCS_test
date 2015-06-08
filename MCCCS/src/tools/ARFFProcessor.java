@@ -601,13 +601,13 @@ public class ARFFProcessor {
 							}
 						}
 						// convert probability to grayValue
-						if (s.length > 0 && mask[x][y] != Settings.back) {
-							int val = (int) (probability * 256);
+						if (s.length > 0 && (useAll || mask[x][y] != Settings.back)) {
+							int val = (int) (probability * 255);
 							
 							try {
 								mask[x][y] = new Color(val, val, val).getRGB();
 							} catch (Exception e) {
-								System.out.println(val);
+								System.out.println("Invalid probability value (can't interpret as color value, range 0..255): " + val);
 							}
 							
 						} else
@@ -619,6 +619,83 @@ public class ARFFProcessor {
 			br.close();
 			
 			new Image(mask).saveToFile(parent + "/probability_" + idxClass + ".png");
+		}
+		
+	}
+	
+	/**
+	 * Creates grayscale image by using class probabilities (uses all information of arff file, ignores mask)
+	 */
+	public void convertArffToImageMultiLabelFloatImage(String parent, int w, int h, String name, boolean debug)
+			throws IOException {
+		
+		int idxClass = 0;
+		
+		// create grayscale image for each class
+		for (idxClass = 0; idxClass < Settings.numberOfClasses; idxClass++) {
+			FileReader fr = new FileReader(parent + "/" + name + ".arff");
+			BufferedReader br = new BufferedReader(fr);
+			float[][] mask = new float[w][h];
+			// skip header
+			boolean headpresent = true;
+			while (headpresent) {
+				String line = br.readLine();
+				// System.out.println(line);
+				if (line.contains("@data"))
+					headpresent = false;
+			}
+			
+			boolean goToStart = false;
+			int savedX = 0;
+			int savedY = 0;
+			
+			out: for (int x = 0; x < w; x++) {
+				for (int y = 0; y < h; y++) {
+					
+					if (goToStart) {
+						x = savedX;
+						y = savedY;
+						goToStart = false;
+					}
+					String line = br.readLine();
+					// end of file ?
+					if (line == null)
+						break out;
+					if (line.contains("%"))
+						break out;
+					if (line.length() == 0) {
+						// skip empty lines in arff file
+						goToStart = true;
+						savedX = x;
+						savedY = y;
+						continue;
+					}
+					String[] s = line.split(",");
+					boolean classInfoReached = false;
+					int count = 0;
+					float probability = 0;
+					for (String v : s) {
+						if (v.contains("class")) {
+							classInfoReached = true;
+							continue;
+						}
+						if (classInfoReached) {
+							if (idxClass == count) {
+								probability = Float.parseFloat(v);
+								break;
+							}
+							count++;
+						}
+					}
+					// convert probability to grayValue
+					if (s.length > 0)
+						mask[x][y] = probability;
+				}
+			}
+			
+			br.close();
+			
+			new Image(mask).saveToFile(parent + "/probability_" + idxClass + ".tif");
 		}
 		
 	}
