@@ -12,20 +12,12 @@ rm -f ${dir}/mask_2.png
 $JAVA.SplitRGB ${dir}/*rgb*
 
 echo -n "b"
-$JAVA.RGB2HSV ${dir}/*rgb_r.tif ${dir}/*rgb_g.tif ${dir}/*rgb_b.tif 8
-$JAVA.RGB2XYZ ${dir}/*rgb_r.tif ${dir}/*rgb_g.tif ${dir}/*rgb_b.tif 8
-$JAVA.RGB2LAB ${dir}/*rgb_r.tif ${dir}/*rgb_g.tif ${dir}/*rgb_b.tif 8
+source ../createChannelImages.sh
 
-#echo -n "c"
-#for img in ${dir}/channel*;
-#do
-#	$JAVA.FILTER ${img} ${img} 3 3 BLUR
-#	$JAVA.FILTER ${img} ${img} 4 4 MEDIAN
-#done
 echo -n "d"
 $JAVA.ThresholdGTforFGBG ${dir}/*label*
 echo -n "e"
-$JAVA.ArffSampleFileGenerator -2 2500 "${dir}"
+$JAVA.ArffSampleFileGenerator -2 2000 "${dir}"
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
 if [ "$NPROCS" == "1" ];
