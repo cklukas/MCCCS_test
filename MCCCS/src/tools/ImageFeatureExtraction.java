@@ -35,25 +35,30 @@ public class ImageFeatureExtraction {
 			case SHARPEN:
 				ImagePlus imgp = img.getAsImagePlus();
 				imgp.getProcessor().sharpen();
-				res.put(mode.name(), new Image(imgp));
+				res.put(FeatureMode.SHARPEN.name(), new Image(imgp));
 				if (br)
 					break;
 			case BLUR:
 				img.getAsImagePlus().getProcessor().blurGaussian(parm_sigma);
-				res.put(mode.name(), img);
+				res.put(FeatureMode.BLUR.name(), img);
 				if (br)
 					break;
 			case MEDIAN:
 				RankFilters rf = new RankFilters();
 				rf.rank(img.getAsImagePlus().getProcessor(), masksize, RankFilters.MEDIAN);
-				res.put(mode.name(), img);
+				res.put(FeatureMode.MEDIAN.name(), img);
 				if (br)
 					break;
 			case TEXTURE:
 				ImageStack is = calcTextureForVizualization(img.io(), masksize);
 				int idx = 1;
-				for (ImageProcessor i : is)
-					res.put(mode.name() + "_" + is.getImageLabel(idx++), new Image(i));
+				for (ImageProcessor i : is) {
+					// use Median filter to suppress noise (may caused by discontinuities)
+					RankFilters rf2 = new RankFilters();
+					rf2.rank(i, 2, RankFilters.MEDIAN);
+					Image filteredImage = new Image(i).io().getImage();
+					res.put(FeatureMode.TEXTURE.name() + "_" + is.getImageLabel(idx++), filteredImage);
+				}
 				break;
 			default:
 				break;
