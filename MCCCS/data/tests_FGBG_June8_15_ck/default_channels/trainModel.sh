@@ -1,4 +1,4 @@
-$WEKA weka.classifiers.trees.RandomForest -t 'all_fgbg.arff' -d fgbg.model -I 100 -K 0 -S 1
+$WEKA weka.classifiers.trees.RandomForest -t 'all_fgbg.arff' -d fgbg.model -I 20 -K 0 -S 1
 #$WEKA weka.classifiers.trees.J48 -t 'all_fgbg.arff' -d fgbg.model -C 0.25 -M 2
 
 

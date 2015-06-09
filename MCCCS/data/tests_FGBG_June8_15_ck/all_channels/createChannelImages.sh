@@ -6,6 +6,11 @@ $JAVA.RGB2ALL ${dir}/*rgb_r.tif ${dir}/*rgb_g.tif ${dir}/*rgb_b.tif 8 -1 4
 #echo -n "c"
 #for img in ${dir}/channel*;
 #do
-	#$JAVA.FILTER ${img} ${img} 3 3 BLUR
-	#$JAVA.FILTER ${img} ${img} 4 4 MEDIAN
+#	$JAVA.FILTER ${img} ${img} 3 3 BLUR
+#	$JAVA.FILTER ${img} ${img} 4 4 MEDIAN
 #done
+
+#create gradient image to provide relative pixel position (related to image center)
+#to the machine learning approach
+$JAVA.CreateCircularGradientImage ${dir}/*rgb_r.tif ${dir}/channel_circular_gradient.tif
+

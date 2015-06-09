@@ -8,10 +8,10 @@ echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 
 # stop in case of error:
 set -e
-PF="$(pwd)/predict_folder.sh"
+PREDICT_FOLDER="$(pwd)/predict_folder.sh"
 if ! [[ "$(uname)" == CYGWIN* ]]
 then
-	chmod +x $PF
+	chmod +x $PREDICT_FOLDER
 fi
 if [ "$(uname)" == "Darwin" ]; then
 realpath() {
@@ -66,8 +66,8 @@ echo "(g) Quantify predicted areas."
 echo
 echo "[Depending on the number of images, the prediction phase may take a longer time]"
 echo
-#ls -1 -d */ | grep -v CVS | $par $PF $2 {}
-find * -maxdepth 0 -type d | grep -F -v CVS | $par $PF $WORKDIR {}
+#ls -1 -d */ | grep -v CVS | $par $PREDICT_FOLDER $2 {}
+find * -maxdepth 0 -type d | grep -F -v CVS | $par $PREDICT_FOLDER $WORKDIR {} $WORKDIR/..
 echo
 echo "Transform result CSV file into column oriented CSV file..."
 rm -f all_prediction_results.csv.transformed

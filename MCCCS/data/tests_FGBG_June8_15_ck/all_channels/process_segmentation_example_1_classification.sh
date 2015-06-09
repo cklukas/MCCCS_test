@@ -27,18 +27,17 @@ echo "°                 TRAINING PHASE FOR A1, A2 and A3                  °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 
-#bash ./train_FGBG_CVPPP.sh .. A1_training h A1
-#bash ./train_FGBG_CVPPP.sh .. A2_training h A2
+bash ./train_FGBG_CVPPP.sh .. A1_training h A1
+bash ./train_FGBG_CVPPP.sh .. A2_training h A2
 bash ./train_FGBG_CVPPP.sh .. A3_training s A3
 
-exit
 
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 echo "°                                                                   °"
-echo "°                 PREDICTION PHASE FOR A1, A2 and A3                  °"
+echo "°                 PREDICTION PHASE FOR A1, A2 and A3                °"
 echo "°                                                                   °"
 echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°"
 
-#bash ./predict_CVPPP.sh .. A1_prediction A1_training/fgbg.model h A1
-#bash ./predict_CVPPP.sh .. A2_prediction A2_training/fgbg.model h A2
+bash ./predict_CVPPP.sh .. A1_prediction A1_training/fgbg.model h A1
+bash ./predict_CVPPP.sh .. A2_prediction A2_training/fgbg.model h A2
 bash ./predict_CVPPP.sh .. A3_prediction A3_training/fgbg.model s A3

@@ -1,6 +1,7 @@
 #!/bin/bash
 dir=$2
 dir=${dir%*/}
+WORKDIR=$3
 START=$(date +%s)
 echo -n "[${dir}]"   
 echo -n "a"
@@ -12,7 +13,7 @@ $JAVA.SplitRGB ${dir}/*rgb*
 
 #apply filter
 echo -n "b"
-source createChannelImages.sh
+source $WORKDIR/createChannelImages.sh
 
 echo -n "d"
 classes=2
