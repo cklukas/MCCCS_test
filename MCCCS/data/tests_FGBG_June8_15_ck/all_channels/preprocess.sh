@@ -17,7 +17,7 @@ source ../createChannelImages.sh
 echo -n "d"
 $JAVA.ThresholdGTforFGBG ${dir}/*label*
 echo -n "e"
-$JAVA.ArffSampleFileGenerator -2 2500 "${dir}"
+$JAVA.ArffSampleFileGenerator -2 2000 "${dir}"
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
 if [ "$NPROCS" == "1" ];
