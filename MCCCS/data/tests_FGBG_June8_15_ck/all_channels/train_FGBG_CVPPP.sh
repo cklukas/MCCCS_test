@@ -78,21 +78,27 @@ do
  	else
 		START=$(date +%s)
 		echo
-	    	dir=${dir%*/}
-	    	echo -n "[${dir}]"  
+	   	dir=${dir%*/}
+	   	echo -n "[${dir}]"
 	    
-	    	echo -n "a"
+	   	echo -n "a"
 	   	rm -f "${dir}/${dir}.arff"
-	    	$JAVA.ArffFromImageFileGenerator 2 "${dir}"
+	   	$JAVA.ArffFromImageFileGenerator 2 "${dir}"
 	    	
 	 	echo -n "b"
-	 	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized fgbg.model -classification -remove-old-class -o "${dir}/result.arff" -c last
+	 	$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_2.arff" -serialized fgbg.model -classification -remove-old-class -o "${dir}/result.arff" -c last -distribution
 		
 		echo -n "c"
 		#create foreground png
 		cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
 		$JAVA.ApplyClass0ToImage "${dir}/result.tif"
 		rm "${dir}/result.tif"
+
+        #create foreground png
+        cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
+        $JAVA.ArffToProbabilityImageFileGenerator -2 "${dir}/result.tif"
+        rm "${dir}/result.tif"
+
 		
 		echo -n "d"
 		rm -f ${dir}/foreground_diff.png

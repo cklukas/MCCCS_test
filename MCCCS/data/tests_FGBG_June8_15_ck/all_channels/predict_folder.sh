@@ -29,13 +29,18 @@ classes=2
 $JAVA.ArffFromImageFileGenerator $classes "${dir}"
 
 echo -n "e"
-$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_$classes.arff" -serialized "$MODEL" -classification -remove-old-class -o "${dir}/result.arff" -c last
+$WEKA weka.filters.supervised.attribute.AddClassification -i "${dir}/${dir}_$classes.arff" -serialized "$MODEL" -classification -remove-old-class -o "${dir}/result.arff" -c last -distribution
 
 echo -n "f"
 #create foreground png
 cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
 $JAVA.ApplyClass0ToImage "${dir}/result.tif"
 rm "${dir}/result.tif"
+
+#create foreground png
+#cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
+#$JAVA.ArffToProbabilityImageFileGenerator $classes "${dir}/result.tif"
+#rm "${dir}/result.tif"
 
 echo -n "g"
 #quantify prediction errors based on colored 'diff' image
@@ -45,7 +50,7 @@ rm "${dir}/foreground_cluster.png"
 cat ${dir}/*_quantified.csv >> all_prediction_results.csv
 
 rm -f ${dir}/channel_*
-rm -f ${dir}/*.arff
+#rm -f ${dir}/*.arff
 
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
