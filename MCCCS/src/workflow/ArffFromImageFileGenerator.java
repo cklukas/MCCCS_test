@@ -79,7 +79,7 @@ public class ArffFromImageFileGenerator {
 						name = f.getName();
 					
 					String path = f.getPath();
-					ac.convertImagesToArff(isl[0], path, name + "_" + Settings.numberOfClasses, mask, false, false);
+					ac.convertImagesToArff(isl[0], path, name + "_" + Settings.numberOfClasses, mask, false);
 				}
 			}
 		}
