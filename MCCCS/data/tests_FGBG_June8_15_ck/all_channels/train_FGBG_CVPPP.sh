@@ -8,10 +8,10 @@ echo "°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 # parms: 1. path to mcccs.jar 2. processing directory 3. s - single-threaded, m -multi-threaded
 # stop in case of error:
 set -e
-PRES="$(pwd)/preprocess.sh"
+PREPROCESS="$(pwd)/preprocess.sh"
 if ! [[ "$(uname)" == CYGWIN* ]]
 then
-	chmod +x $PRES
+	chmod +x $PREPROCESS
 	chmod +x "prepare.sh"
 fi
 if [ "$(uname)" == "Darwin" ]; then
@@ -29,7 +29,7 @@ echo "(c) Perform image operations to extend the channel list."
 echo "(d) Generate ARFF files from training data." 
 echo "(e) Create or extend ARFF file 'all_fbgb.arff'."
 echo
-find * -maxdepth 0 -type d | grep -F -v CVS | $par $PRES $2 {}
+find * -maxdepth 0 -type d | grep -F -v CVS | $par $PREPROCESS $2 {}
 echo
 echo "Create overall FB/GB training data set file 'all_fgbg.arff'..."
 FIRST="yes"
@@ -55,10 +55,7 @@ echo "Classifier-Training:"
 echo "Train FGBG classifier from file 'all_fgbg.arff'..."
 echo
 START=$(date +%s)
-#$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.J48 -- -C 0.25 -M 2
-#$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.bayes.NaiveBayes
-$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.trees.RandomForest -- -I 100 -K 0 -S 1
-#$WEKA weka.classifiers.meta.FilteredClassifier -t 'all_fgbg.arff' -d fgbg.model -W weka.classifiers.bayes.BayesNet -- -D -Q weka.classifiers.bayes.net.search.local.K2 -- -S BAYES -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+source ../trainModel.sh
 echo
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
