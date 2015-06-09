@@ -33,7 +33,7 @@ public class ClassifierFGBG_Process_16Bit extends AbstractClassifier_16Bit {
 			applyedM.show("masked");
 		}
 		// ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, false, "label", false); // back => Float.MAX_VALUE
-		ARFFProcessor.createTrainingDataSet(fgbg, Float.MAX_VALUE, f, numberofsamples, arffFileName, false, "fgbg", false);
+		ARFFProcessor.createTrainingDataSet(fgbg, Float.MAX_VALUE, f, numberofsamples, arffFileName, false, "fgbg");
 	}
 	
 	private ImageStack[] getFGBG(ImageStack applyedM) {

@@ -51,7 +51,7 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 			while (gt.getStack().getSize() > 0)
 				gt.getStack().deleteLastSlice();
 		}
-		ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, true, "label", false); // back => Float.MAX_VALUE
+		ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, true, "label"); // back => Float.MAX_VALUE
 	}
 	
 	/**
