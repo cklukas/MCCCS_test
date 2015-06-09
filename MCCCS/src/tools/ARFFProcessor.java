@@ -73,8 +73,9 @@ public class ARFFProcessor {
 		String attributes = "";
 
 		for (int i = 0; i < numberOfChannels; i++) {
-			attributes += "@attribute " + inputImages[0].getImageLabel(i + 1)
-					+ "\tREAL\n";
+			attributes += "@attribute "
+					+ makeNice(inputImages[0].getImageLabel(i + 1))
+					+ "\tNUMERIC\n";
 		}
 
 		if (addOtherColorValuesFromRGBbands) {
@@ -285,16 +286,17 @@ public class ARFFProcessor {
 		String attributes = "";
 
 		for (int i = 0; i < numberOfChannels; i++) {
-			attributes += "@attribute " + isl.getImageLabel(i + 1) + "\tREAL\n";
+			attributes += "@attribute " + makeNice(isl.getImageLabel(i + 1))
+					+ "\tNUMERIC\n";
 		}
 
 		if (addOtherColorValuesFromRGBbands) {
-			attributes += "@attribute X\tREAL\n";
-			attributes += "@attribute Y\tREAL\n";
-			attributes += "@attribute Z\tREAL\n";
-			attributes += "@attribute L\tREAL\n";
-			attributes += "@attribute a\tREAL\n";
-			attributes += "@attribute b\tREAL\n";
+			attributes += "@attribute X\tNUMERIC\n";
+			attributes += "@attribute Y\tNUMERIC\n";
+			attributes += "@attribute Z\tNUMERIC\n";
+			attributes += "@attribute L\tNUMERIC\n";
+			attributes += "@attribute a\tNUMERIC\n";
+			attributes += "@attribute b\tNUMERIC\n";
 		}
 
 		int numberOfDiseaseClasses = Settings.numberOfClasses;
@@ -363,6 +365,16 @@ public class ARFFProcessor {
 
 		fw.write("%");
 		fw.close();
+	}
+
+	public static String makeNice(String imageLabel) {
+		imageLabel = StringManipulationTools.stringReplace(imageLabel,
+				"channel_", "");
+		imageLabel = StringManipulationTools.stringReplace(imageLabel,
+				"_Custom", "");
+		imageLabel = StringManipulationTools
+				.stringReplace(imageLabel, ".", "_");
+		return imageLabel;
 	}
 
 	/**
