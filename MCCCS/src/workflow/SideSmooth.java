@@ -112,35 +112,35 @@ public class SideSmooth {
 		int fromBorder = 20;
 		LinkedList<LocalComputeJob> wait = new LinkedList<>();
 		try {
-			BackgroundThreadDispatcher.addTask(() -> {
-				for (int x = bounds.x; x < bounds.x + bounds.width; x++) {
+			// BackgroundThreadDispatcher.addTask(() -> {
+			for (int x = bounds.x; x < bounds.x + bounds.width; x++) {
+				if (img[x][y] != Settings.back) {
+					pf_left.addPoint(y, x);
+					if (y < bounds.y + fromBorder) {
+						pf_left.addPoint(bounds.y - (y - bounds.y), x);
+					}
+					if (y > bounds.y + bounds.height - fromBorder) {
+						pf_left.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
+					}
+					break;
+				}
+			}
+			// }, "scan left");
+			// BackgroundThreadDispatcher.addTask(() -> {
+			for (int x = bounds.x + bounds.width; x >= bounds.x; x--) {
+				if (x < img.length && y < img[0].length)
 					if (img[x][y] != Settings.back) {
-						pf_left.addPoint(y, x);
+						pf_right.addPoint(y, x);
 						if (y < bounds.y + fromBorder) {
-							pf_left.addPoint(bounds.y - (y - bounds.y), x);
+							pf_right.addPoint(bounds.y - (y - bounds.y), x);
 						}
 						if (y > bounds.y + bounds.height - fromBorder) {
-							pf_left.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
+							pf_right.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
 						}
 						break;
 					}
-				}
-			}, "scan left");
-			BackgroundThreadDispatcher.addTask(() -> {
-				for (int x = bounds.x + bounds.width; x >= bounds.x; x--) {
-					if (x < img.length && y < img[0].length)
-						if (img[x][y] != Settings.back) {
-							pf_right.addPoint(y, x);
-							if (y < bounds.y + fromBorder) {
-								pf_right.addPoint(bounds.y - (y - bounds.y), x);
-							}
-							if (y > bounds.y + bounds.height - fromBorder) {
-								pf_right.addPoint(bounds.y + bounds.height + (bounds.y + bounds.height - y), x);
-							}
-							break;
-						}
-				}
-			}, "scan right");
+			}
+			// }, "scan right");
 			BackgroundThreadDispatcher.waitFor(wait);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
