@@ -28,10 +28,10 @@ cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
 $JAVA.ApplyClass0ToImage "${dir}/result.tif"
 rm "${dir}/result.tif"
 
-#create foreground png
-#cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
-#$JAVA.ArffToProbabilityImageFileGenerator $classes "${dir}/result.tif"
-#rm "${dir}/result.tif"
+create foreground png
+cp "${dir}/channel_rgb_r.tif" "${dir}/result.tif"
+$JAVA.ArffToProbabilityImageFileGenerator $classes "${dir}/result.tif"
+rm "${dir}/result.tif"
 
 echo -n "g"
 #quantify prediction errors based on colored 'diff' image
@@ -41,7 +41,7 @@ rm "${dir}/foreground_cluster.png"
 cat ${dir}/*_quantified.csv >> all_prediction_results.csv
 
 rm -f ${dir}/channel_*
-#rm -f ${dir}/*.arff
+rm -f ${dir}/*.arff
 
 END=$(date +%s)
 DIFF=$(echo "$END - $START" | bc)
