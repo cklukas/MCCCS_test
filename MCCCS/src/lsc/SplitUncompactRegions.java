@@ -28,9 +28,7 @@ public class SplitUncompactRegions {
 	
 	public static void main(String[] args) throws Exception {
 		
-		boolean alternative_strategy = false;
-		
-		boolean debug = false;
+		boolean debug = true;
 		{
 			new Settings(false);
 		}
@@ -110,6 +108,7 @@ public class SplitUncompactRegions {
 							continue;
 						double c = splitRegionGetCompactnessSum(colorOfRegionWithMinimumCompactness, color2region, color2regionOutline, startP, endP, ia, false);
 						if (c > maxComp) {
+							maxComp = c;
 							bestStartP = startP;
 							bestEndP = endP;
 						}
@@ -155,7 +154,7 @@ public class SplitUncompactRegions {
 		
 		ArrayList<Vector2i> line = drawLine(bestStartP, bestEndP);
 		Vector2i A = bestStartP;
-		Vector2i B = bestStartP;
+		Vector2i B = bestEndP;
 		int areaA = 0;
 		int areaB = 0;
 		for (Vector2i p : color2region.get(colorOfRegionWithMinimumCompactness)) {
@@ -189,10 +188,10 @@ public class SplitUncompactRegions {
 		areaA = areaA - line.size() + 2;
 		areaB = areaB - line.size() + 2;
 		
-		double compactnessA = 4 * Math.PI / (outlineA * outlineA / areaA);
-		double compactnessB = 4 * Math.PI / (outlineB * outlineB / areaB);
+		double compactnessA = areaA <= 0 ? -Double.MAX_VALUE : 4 * Math.PI / (outlineA * outlineA / areaA);
+		double compactnessB = areaB <= 0 ? -Double.MAX_VALUE : 4 * Math.PI / (outlineB * outlineB / areaB);
 		
-		return compactnessA + compactnessB;
+		return (compactnessA + compactnessB);
 	}
 	
 	// position = sign( (Bx-Ax)*(Y-Ay) - (By-Ay)*(X-Ax) )
