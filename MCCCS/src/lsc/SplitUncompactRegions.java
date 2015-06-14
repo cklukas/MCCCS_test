@@ -140,8 +140,8 @@ public class SplitUncompactRegions {
 		int g = c.getGreen();
 		int b = c.getBlue();
 		Color.RGBtoHSB(r, g, b, hsv);
-		Color cA = Color.getHSBColor(hsv[0], hsv[1] * 0.75f, hsv[2]);
-		Color cB = Color.getHSBColor(hsv[0], hsv[1], hsv[2] * 0.75f);
+		Color cA = Color.getHSBColor(hsv[0], hsv[1] * 0.85f, hsv[2]);
+		Color cB = Color.getHSBColor(hsv[0], hsv[1], hsv[2] * 0.85f);
 		int colA = cA.getRGB();
 		int colB = cB.getRGB();
 		
@@ -191,7 +191,7 @@ public class SplitUncompactRegions {
 		double compactnessA = areaA <= 0 ? -Double.MAX_VALUE : 4 * Math.PI / (outlineA * outlineA / areaA);
 		double compactnessB = areaB <= 0 ? -Double.MAX_VALUE : 4 * Math.PI / (outlineB * outlineB / areaB);
 		
-		return (compactnessA + compactnessB);
+		return -line.size();
 	}
 	
 	// position = sign( (Bx-Ax)*(Y-Ay) - (By-Ay)*(X-Ax) )
