@@ -12,6 +12,7 @@ import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import workflow.Settings;
 import de.ipk.ag_ba.image.structures.Image;
+import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.layout_control.dbe.TableData;
 
 /**
  * Merge colored regions, which touch each other. Do that until provided target
@@ -41,13 +42,32 @@ public class MergeTouchingRegions {
 		}
 		if (args == null || args.length != 4) {
 			System.err
-					.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point)] [strategy 0..3] provided as parameters! Return Code 1");
+					.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point), or csv file with column a: image file name, column b: target count] [strategy 0..3] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			alternative_strategy_0to3 = Integer.parseInt(args[3]);
 
-			Image img = new Image(FileSystemHandler.getURL(new File(args[0])));
-			double targetCount = Double.parseDouble(args[2]);
+			File inpf = new File(args[0]);
+			Image img = new Image(FileSystemHandler.getURL(inpf));
+			double targetCount = Double.NaN;
+			File f = new File(args[2]);
+			if (!f.exists()) {
+				targetCount = Double.parseDouble(args[2]);
+			} else {
+				TableData td = TableData.getTableData(f);
+				for (int row = 0; row < td.getMaximumRow(); row++) {
+					String fileName = td.getCellDataDate(0, row, null);
+					if (fileName != null && new File(fileName).getName().equalsIgnoreCase(inpf.getName())) {
+						targetCount = Double.parseDouble(td.getCellDataDate(1, row, null));
+					}
+				}
+			}
+			if (Double.isNaN(targetCount)) {
+				System.out.println("Error: could not fine file '" + inpf.getName()
+						+ "' in column 1 of the table data. That would be used for looking-up the target segment count in column 2 of the corresponding row in input file '"
+						+ args[2] + "'. Return 1");
+				System.exit(1);
+			}
 			int w = img.getWidth();
 			int h = img.getHeight();
 			int[][] ia = img.getAs2A();
