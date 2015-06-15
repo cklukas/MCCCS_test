@@ -27,17 +27,17 @@ public class ColoredRegionGrowing {
 			System.exit(1);
 		} else {
 			Image img = new Image(FileSystemHandler.getURL(new File(args[0])));
-			Image edgesImg = new Image(FileSystemHandler.getURL(new File(args[1])));
+			Image gtImg = new Image(FileSystemHandler.getURL(new File(args[1])));
 			int w = img.getWidth();
 			int h = img.getHeight();
 			int uncolored = Color.WHITE.getRGB();
-			int[][] edges = edgesImg.getAs2A();
+			int[][] gt = gtImg.getAs2A();
 			int[][] ia = img.getAs2A();
 			int[][] it = img.getAs2A();
 			img.io().stat().printColorCodes(true);
 			for (int x = 0; x < w; x++) {
 				for (int y = 0; y < h; y++) {
-					if (edges[x][y] != Settings.back)
+					if (gt[x][y] == Settings.back && ia[x][y] == Settings.back)
 						ia[x][y] = uncolored;
 					int c = ia[x][y];
 					if (c != Settings.back) {
