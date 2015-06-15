@@ -36,9 +36,9 @@ public class PrepareEdgeImagesForRG {
 			
 			Arrays.sort(files);
 			
-			for (int i = 0; i < files.length; i = +2) {
-				File labelFile = new File(new File(args[i]).getAbsolutePath() + File.separator + files[i]);
-				File indexFile = new File(new File(args[i + 1]).getAbsolutePath() + File.separator + files[i + 1]);
+			for (int i = 0; i < files.length; i = i + 2) {
+				File labelFile = new File(new File(args[0]).getAbsolutePath() + File.separator + files[i]);
+				File indexFile = new File(new File(args[0]).getAbsolutePath() + File.separator + files[i + 1]);
 				ImageOperation.BACKGROUND_COLORint = Color.BLACK.getRGB();
 				ImageOperation.BACKGROUND_COLOR = new Color(
 						ImageOperation.BACKGROUND_COLORint);
