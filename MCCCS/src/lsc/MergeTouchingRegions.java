@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.help.UnsupportedOperationException;
+
 import org.Vector2i;
 import org.color.ColorUtil;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -31,16 +33,19 @@ public class MergeTouchingRegions {
 
 	public static void main(String[] args) throws Exception {
 
-		boolean alternative_strategy = false;
+		int alternative_strategy_0to3 = 3;
 
 		boolean debug = false;
 		{
 			new Settings(false);
 		}
-		if (args == null || args.length != 3) {
-			System.err.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point)] provided as parameters! Return Code 1");
+		if (args == null || args.length != 4) {
+			System.err
+					.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point)] [strategy 0..3] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
+			alternative_strategy_0to3 = Integer.parseInt(args[3]);
+
 			Image img = new Image(FileSystemHandler.getURL(new File(args[0])));
 			double targetCount = Double.parseDouble(args[2]);
 			int w = img.getWidth();
@@ -78,7 +83,10 @@ public class MergeTouchingRegions {
 					int borderPixels = regionOutline.size();
 					int filledArea = region.size();
 
-					double c = 4 * Math.PI / (borderPixels * borderPixels / filledArea);
+					double c = (borderPixels * borderPixels / filledArea); // 4
+																			// *
+																			// Math.PI
+																			// /
 					color2compactness.put(color, c);
 				}
 
@@ -111,13 +119,29 @@ public class MergeTouchingRegions {
 							* countTouchingPixels(color2regionOutline.get(color1), color2, ia, w, h);
 					int filledArea = color2region.get(color1).size() + color2region.get(color2).size();
 
-					double mergedCompactness = 4 * Math.PI / (borderPixels * borderPixels / filledArea);
+					double mergedCompactness = (borderPixels * borderPixels / filledArea); // 4
+																							// *
+																							// Math.PI
+																							// /
+																							// ...
 
 					double improvement;
-					if (alternative_strategy)
-						improvement = 2 * mergedCompactness - c1 - c2;
-					else
+					switch (alternative_strategy_0to3) {
+					case 0:
 						improvement = mergedCompactness;
+						break;
+					case 1:
+						improvement = mergedCompactness - c1 - c2;
+						break;
+					case 2:
+						improvement = -c1 - c2;
+						break;
+					case 3:
+						improvement = Math.max(c1, c2) - Math.min(c1, c2);
+						break;
+					default:
+						throw new UnsupportedOperationException("Not supported strategy");
+					}
 
 					if (debug)
 						System.out.println("MERGING " + color1 + " (c=" + c1 + ") with " + color2 + " (c=" + c2 + ") creates a form with compactness of " + mergedCompactness);
