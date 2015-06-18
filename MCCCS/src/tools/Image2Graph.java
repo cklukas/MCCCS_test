@@ -1,7 +1,10 @@
 package tools;
 
 import java.awt.Color;
+import java.util.HashSet;
+import java.util.LinkedList;
 
+import org.AttributeHelper;
 import org.graffiti.graph.AdjListGraph;
 import org.graffiti.graph.Graph;
 import org.graffiti.graph.Node;
@@ -14,7 +17,8 @@ import de.ipk_gatersleben.ag_nw.graffiti.GraphHelper;
  *
  */
 public class Image2Graph {
-	private Graph graph;
+	// private Graph graph;
+	private Node[][] nodeMap;
 
 	public Image2Graph(Image i, int back) {
 		int[][] ia = i.getAs2A();
@@ -23,6 +27,7 @@ public class Image2Graph {
 
 		Graph g = new AdjListGraph();
 		Node[][] nodes = new Node[w][h];
+		this.nodeMap = nodes;
 		// add node for every foreground pixel
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
@@ -36,7 +41,8 @@ public class Image2Graph {
 		for (int x = 0; x < w; x++)
 			for (int y = 0; y < h; y++) {
 				Node n = nodes[x][y];
-
+				if (n == null)
+					continue;
 				for (int xo = -1; xo <= 1; xo++)
 					for (int yo = -1; yo <= 1; yo++) {
 						int xt = x + xo;
@@ -46,9 +52,39 @@ public class Image2Graph {
 						Node n2 = nodes[xt][yt];
 						if (n2 == n)
 							continue;
+						if (n2 == null)
+							continue;
 						g.addEdge(n, n2, false);
 					}
 			}
-		this.graph = g;
+		// this.graph = g;
+	}
+
+	public int getColorOfNearestColoredNode(Node n, int uncolored) {
+		LinkedList<Node> todo = new LinkedList<Node>();
+		HashSet<Node> visited = new HashSet<Node>();
+
+		todo.add(n);
+		visited.add(n);
+
+		while (!todo.isEmpty()) {
+			Node nn = todo.removeFirst();
+			Color c = AttributeHelper.getFillColor(nn);
+			if (c.getRGB() != uncolored) {
+				return c.getRGB();
+			} else {
+				for (Node nei : nn.getNeighbors())
+					if (!visited.contains(nei)) {
+						todo.add(nei);
+						visited.add(nei);
+					}
+			}
+		}
+
+		return uncolored;
+	}
+
+	public Node[][] getNodeMap() {
+		return nodeMap;
 	}
 }
