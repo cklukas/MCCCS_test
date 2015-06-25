@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.Image;
 
 /**
  * Create image by calculating the difference, sum, division or multiplication of two images.
- * input: param 1 image A, params 2 imageB, param 3 output file, param 4 one of this: +,-,*,/.
+ * input: param 1 image A, params 2 imageB, param 3 output file, param 4 one of this: +,-,*,/, absdiff.
  * output: difference image according to operation in param 4
  * 
  * @author Christian Klukas
@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class CalcImage {
 	
 	private enum Operation {
-		plus, minus, times, divide
+		plus, minus, times, divide, absolute_of_difference, max, min, logratio
 	};
 	
 	public static void main(String[] args) throws IOException, Exception {
@@ -26,7 +26,7 @@ public class CalcImage {
 			new Settings();
 		}
 		if (args == null || args.length != 4) {
-			System.err.println("Params: [image A (float)] [image B (float)] [target file] [-+*/] ! Return Code 1");
+			System.err.println("Params: [image A (float)] [image B (float)] [target file] [-,+,*,/,absdiff,max,min,logratio] ! Return Code 1");
 			System.exit(1);
 		} else {
 			File f_a = new File(args[0]);
@@ -42,6 +42,14 @@ public class CalcImage {
 				op = Operation.times;
 			if (arg3.equals("/"))
 				op = Operation.divide;
+			if (arg3.equalsIgnoreCase("absdiff"))
+				op = Operation.absolute_of_difference;
+			if (arg3.equalsIgnoreCase("max"))
+				op = Operation.max;
+			if (arg3.equalsIgnoreCase("min"))
+				op = Operation.min;
+			if (arg3.equalsIgnoreCase("logratio"))
+				op = Operation.logratio;
 			if (op == null) {
 				System.err.println("Error - Operation  '" + args[3] + "' is unknown! Return Code 3");
 				System.exit(3);
@@ -68,6 +76,22 @@ public class CalcImage {
 						}
 						float[] out = new float[imgAf.length];
 						switch (op) {
+							case logratio:
+								for (int i = 0; i < imgAf.length; i++)
+									out[i] = (float) (Math.log(imgAf[i]) - Math.log(imgBf[i]));
+								break;
+							case max:
+								for (int i = 0; i < imgAf.length; i++)
+									out[i] = Math.max(imgAf[i], imgBf[i]);
+								break;
+							case min:
+								for (int i = 0; i < imgAf.length; i++)
+									out[i] = Math.min(imgAf[i], imgBf[i]);
+								break;
+							case absolute_of_difference:
+								for (int i = 0; i < imgAf.length; i++)
+									out[i] = Math.abs(imgAf[i] - imgBf[i]);
+								break;
 							case divide:
 								for (int i = 0; i < imgAf.length; i++)
 									out[i] = imgAf[i] / imgBf[i];
