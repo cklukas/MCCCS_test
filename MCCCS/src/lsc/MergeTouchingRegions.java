@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
-import javax.help.UnsupportedOperationException;
-
 import org.Vector2i;
 import org.color.ColorUtil;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
