@@ -27,7 +27,7 @@ public class FILTER {
 					System.out.println("param " + pi + ": '" + args[pi] + "'");
 			}
 			System.err
-					.println("First parameter 'input image', second parameter 'output image', third parameter 'int parameter for opertion', fourth 'double param', fifth parameter 'operation mode'! Return Code 1");
+					.println("First parameter 'input image', second parameter 'output image', third parameter 'int parameter for opertion', fourth 'double param', fifth parameter 'operation mode' (SHARPEN, BLUR, MEDIAN, TEXTURE, HARLICK, ALL)! Return Code 1");
 			System.out.println("Operation modes: " + StringManipulationTools.getStringList(ImageFeatureExtraction.FeatureMode.values(), ", "));
 			System.exit(1);
 		} else {
