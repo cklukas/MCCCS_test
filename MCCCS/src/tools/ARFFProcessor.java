@@ -506,12 +506,17 @@ public class ARFFProcessor {
 			new Image(mask).saveToFile(parent + "/classified.png");
 	}
 	
+	public void convertArffToImageMultiLabel(String parent, String name,
+			Image mask_img, boolean useAll, boolean debug) throws IOException {
+		convertArffToImageMultiLabel(parent, name, mask_img, useAll, 0.0f, debug);
+	}
+	
 	/**
 	 * Creates grayscale image by using class probabilities (useAll = true =>
 	 * use all information of arff file, ignores mask)
 	 */
 	public void convertArffToImageMultiLabel(String parent, String name,
-			Image mask_img, boolean useAll, boolean debug) throws IOException {
+			Image mask_img, boolean useAll, float acceptThreshold, boolean debug) throws IOException {
 		
 		ImagePlus ip = mask_img.getAsImagePlus();
 		ImageConverter ic = new ImageConverter(ip);
@@ -519,8 +524,17 @@ public class ARFFProcessor {
 		Image iii = new Image(ip);
 		
 		int[][] mask = iii.getAs2A();
+		int[][] combined = iii.copy().getAs2A();
 		
 		int idxClass = 0;
+		boolean combinedReady = false;
+		
+		ArrayList<Color> colorsAL = Colors.get(Settings.numberOfClasses, 1);
+		int[] colors = new int[colorsAL.size()];
+		
+		int idx = 0;
+		for (Color c : colorsAL)
+			colors[idx++] = c.getRGB();
 		
 		// create grayscale image for each class
 		for (idxClass = 0; idxClass < Settings.numberOfClasses; idxClass++) {
@@ -565,24 +579,21 @@ public class ARFFProcessor {
 						String[] s = line.split(",");
 						boolean classInfoReached = false;
 						int count = 0;
-						float probability = 0;
+						float[] probabilities = new float[Settings.numberOfClasses];
 						for (String v : s) {
 							if (v.contains("class")) {
 								classInfoReached = true;
 								continue;
 							}
 							if (classInfoReached) {
-								if (idxClass == count) {
-									probability = Float.parseFloat(v);
-									break;
-								}
+								probabilities[count] = Float.parseFloat(v);
 								count++;
 							}
 						}
 						// convert probability to grayValue
 						if (s.length > 0
 								&& (useAll || mask[x][y] != Settings.back)) {
-							int val = (int) (probability * 255);
+							int val = (int) (probabilities[idxClass] * 255);
 							
 							try {
 								mask[x][y] = new Color(val, val, val).getRGB();
@@ -591,9 +602,29 @@ public class ARFFProcessor {
 										.println("Invalid probability value (can't interpret as color value, range 0..255): "
 												+ val);
 							}
-							
-						} else
+							if (!combinedReady) {
+								float highestProbability = -1f;
+								int colorForResult = combined[x][y];
+								int probIdx = 0;
+								for (float prob : probabilities) {
+									if (prob > acceptThreshold && prob > highestProbability) {
+										highestProbability = prob;
+										colorForResult = colors[probIdx];
+									}
+									probIdx++;
+								}
+								combined[x][y] = colorForResult;
+							}
+						} else {
 							mask[x][y] = Settings.back;
+							if (!combinedReady)
+								combined[x][y] = Settings.back;
+						}
+					} else {
+						String line = br.readLine();
+						// end of file ?
+						if (line == null)
+							break out;
 					}
 				}
 			}
@@ -602,6 +633,12 @@ public class ARFFProcessor {
 			
 			new Image(mask).saveToFile(parent + "/probability_" + idxClass
 					+ ".png");
+			
+			if (!combinedReady) {
+				new Image(combined).saveToFile(parent + "/probability_combined"
+						+ ".png");
+				combinedReady = true;
+			}
 		}
 		
 	}
