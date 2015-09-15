@@ -9,10 +9,8 @@ import de.ipk.ag_ba.image.operation.DistanceMapFloatMode;
 import de.ipk.ag_ba.image.structures.Image;
 
 /**
- * Create difference image, indicating true positive and true negative in white.
- * False positive in blue and false negative in red.
- * input: param 1 ground truth mask, params 2 prediction, param 3 output file name for difference image.
- * output: difference image according to param 3
+ * Calculate distance map float image
+ * output: distance map image (tiff)
  * 
  * @author Christian Klukas
  */
@@ -39,7 +37,7 @@ public class CalculateDistance {
 							.println("Modes: 0 - eucl. distance map X, 1 - eucl. distance map Y, 2 - eucl. distance map dist, 3 - euchl. distance map degree*255/360");
 					System.err.println("Only modes 0..3 are supported! Return Code 2");
 					System.exit(2);
-				} else
+				} else {
 					if (!f_input_mask.exists()) {
 						System.err.println("File input mask '" + f_input_mask.getName() + "' could not be found! Return Code 2");
 						System.exit(2);
@@ -53,6 +51,7 @@ public class CalculateDistance {
 						
 						new Image(out).saveToFile(f_out.getPath());
 					}
+				}
 		}
 	}
 }
