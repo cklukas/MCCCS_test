@@ -27,6 +27,17 @@ public class Settings {
 	
 	public Settings(boolean invertFGBG) {
 		SystemAnalysis.simulateHeadless = true;
+		
+		boolean debug = false;
+		
+		if (System.getenv("BACKGROUNDFLIP") != null) {
+			invertFGBG = Boolean.parseBoolean(System.getenv("BACKGROUNDFLIP"));
+		}
+		
+		if (System.getenv("DEBUG") != null) {
+			debug = Boolean.parseBoolean(System.getenv("DEBUG"));
+		}
+		
 		if (invertFGBG) {
 			foreground = getBackground();
 			back = Color.WHITE.getRGB();
@@ -36,13 +47,28 @@ public class Settings {
 		}
 		
 		if (System.getenv("BACKGROUND") != null) {
-			back = ColorUtil.getColorFromHex(System.getenv("BACKGROUND")).getRGB();
+			if (System.getenv("BACKGROUND").startsWith("#")) {
+				back = ColorUtil.getColorFromHex(System.getenv("BACKGROUND")).getRGB();
+			} else {
+				back = Integer.parseInt(System.getenv("BACKGROUND"));
+			}
 			ImageOperation.BACKGROUND_COLORint = back;
 			ImageOperation.BACKGROUND_COLOR = new Color(back);
 		}
 		
 		if (System.getenv("FOREGROUND") != null) {
-			foreground = ColorUtil.getColorFromHex(System.getenv("FOREGROUND")).getRGB();
+			if (System.getenv("FOREGROUND").startsWith("#")) {
+				foreground = ColorUtil.getColorFromHex(System.getenv("FOREGROUND")).getRGB();
+			} else {
+				foreground = Integer.parseInt(System.getenv("FOREGROUND"));
+			}
+		}
+		
+		if (debug) {
+			System.out.println("DEBUG: BACKGROUND=" + ColorUtil.getHexFromColor(ImageOperation.BACKGROUND_COLOR) + " / INT=" + ImageOperation.BACKGROUND_COLORint);
+			System.out.println("DEBUG: FOREGROUND=" + ColorUtil.getHexFromColor(new Color(foreground)) + " / INT=" + foreground);
+			System.out.println("HINT: Use environmen variables FOREGROUND and BACKGROUND using Hex-Color code (e.g. #99AAFF), to override these values.");
+			System.out.println("HINT: Color code may also start without '#', then the input is parsed as integer code.");
 		}
 	}
 	
