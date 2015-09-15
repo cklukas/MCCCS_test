@@ -3,6 +3,7 @@ package workflow;
 import java.awt.Color;
 
 import org.SystemAnalysis;
+import org.color.ColorUtil;
 
 import de.ipk.ag_ba.image.operation.ImageOperation;
 
@@ -32,6 +33,16 @@ public class Settings {
 			
 			ImageOperation.BACKGROUND_COLORint = back;
 			ImageOperation.BACKGROUND_COLOR = new Color(back);
+		}
+		
+		if (System.getenv("BACKGROUND") != null) {
+			back = ColorUtil.getColorFromHex(System.getenv("BACKGROUND")).getRGB();
+			ImageOperation.BACKGROUND_COLORint = back;
+			ImageOperation.BACKGROUND_COLOR = new Color(back);
+		}
+		
+		if (System.getenv("FOREGROUND") != null) {
+			foreground = ColorUtil.getColorFromHex(System.getenv("FOREGROUND")).getRGB();
 		}
 	}
 	
