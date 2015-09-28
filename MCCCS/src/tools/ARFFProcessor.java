@@ -48,7 +48,8 @@ public class ARFFProcessor {
 			boolean debug, String id)
 			throws IOException {
 		
-		// background = 0.0f;
+		background = (float) -1.6777216E7; // 0.0f;
+		float background2 = (float) 3.4028235E38;
 		
 		int numberOfClasses = inputImages.length;
 		LinkedList<float[][][]> cubes = new LinkedList<float[][][]>();
@@ -102,7 +103,7 @@ public class ARFFProcessor {
 				for (int y = 0; y < height; y++) {
 					int bc = 0;
 					for (int b = 0; b < bands; b++) {
-						if (cube[x][y][b] == background)
+						if (cube[x][y][b] == background || cube[x][y][b] == background2)
 							bc++;
 					}
 					if (bc < bands) {
