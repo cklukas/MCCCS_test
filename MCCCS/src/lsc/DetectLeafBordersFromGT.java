@@ -36,19 +36,21 @@ public class DetectLeafBordersFromGT {
 					ImageOperation.BACKGROUND_COLORint);
 			for (String a : args) {
 				LinkedList<File> fl = new LinkedList<>();
-				if (a.contains("*")) {
-					String path = new File(a).getParent();
-					for (File f : new File(path).listFiles((fn) -> {
-						String ss = fn.getName().split("_")[1];
-						String sss = new File(a).getName().substring(
-								new File(a).getName().indexOf("*") + 1);
-						return ss.startsWith(sss);
-					})) {
-						fl.add(f);
-					}
-				} else {
-					fl.add(new File(a));
-				}
+				// if (a.contains("*")) {
+				// String path = new File(a).getParent();
+				// for (File f : new File(path).listFiles((fn) -> {
+				// String ss = fn.getName().split("_")[1];
+				// String sss = new File(a).getName().substring(
+				// new File(a).getName().indexOf("*") + 1);
+				// return ss.startsWith(sss);
+				// })) {
+				// fl.add(f);
+				// }
+				// } else {
+				// fl.add(new File(a));
+				// }
+				
+				fl.add(new File(a));
 				
 				for (File f : fl) {
 					ImagePlus input = new Image(FileSystemHandler.getURL(f))
@@ -63,6 +65,7 @@ public class DetectLeafBordersFromGT {
 					ic2.convertToGray8();
 					borders.getProcessor().findEdges();
 					borders.getProcessor().threshold(0);
+					// borders.getProcessor().medianFilter();
 					// borders.show();
 					ImageCalculator icalc = new ImageCalculator();
 					icalc.run("and", input, borders);
@@ -81,6 +84,8 @@ public class DetectLeafBordersFromGT {
 					saveInp = saveInp.io().invertIgnoresBackground().getImage();
 					ImageCalculator icalc2 = new ImageCalculator();
 					icalc2.run("xor", saveInp.getAsImagePlus(), borderimg.getAsImagePlus());
+					saveInp.getAsImagePlus().getProcessor().dilate();
+					saveInp.getAsImagePlus().getProcessor().dilate();
 					saveInp.getAsImagePlus().getProcessor().dilate();
 					saveInp = saveInp.io().invertIgnoresBackground().getImage();
 					saveInp.io().invertIgnoresBackground().getImage().saveToFile(name + "_non_leaf_overlap.png");
