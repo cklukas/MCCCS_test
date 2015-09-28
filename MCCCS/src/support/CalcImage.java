@@ -18,7 +18,7 @@ import de.ipk.ag_ba.image.structures.Image;
 public class CalcImage {
 	
 	private enum Operation {
-		plus, minus, times, divide, absolute_of_difference, max, min, logratio
+		plus, minus, times, divide, absolute_of_difference, max, min, logratio, and
 	};
 	
 	public static void main(String[] args) throws IOException, Exception {
@@ -50,6 +50,8 @@ public class CalcImage {
 				op = Operation.min;
 			if (arg3.equalsIgnoreCase("logratio"))
 				op = Operation.logratio;
+			if (arg3.equalsIgnoreCase("AND"))
+				op = Operation.and;
 			if (op == null) {
 				System.err.println("Error - Operation  '" + args[3] + "' is unknown! Return Code 3");
 				System.exit(3);
@@ -107,6 +109,10 @@ public class CalcImage {
 							case times:
 								for (int i = 0; i < imgAf.length; i++)
 									out[i] = imgAf[i] * imgBf[i];
+								break;
+							case and:
+								for (int i = 0; i < imgAf.length; i++)
+									out[i] = (int) imgAf[i] & (int) imgBf[i];
 								break;
 						}
 						
