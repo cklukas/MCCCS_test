@@ -12,7 +12,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 
 /**
  * Converts image into an ARFF file.
- * input: channel-count, class-count, filename
+ * input: class-count, filename
  * 
  * @author Jean-Michel Pape
  */
