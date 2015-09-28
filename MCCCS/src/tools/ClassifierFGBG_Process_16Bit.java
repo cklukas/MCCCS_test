@@ -3,6 +3,7 @@ package tools;
 import java.io.File;
 import java.io.IOException;
 
+import workflow.Settings;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
 /**
@@ -33,7 +34,7 @@ public class ClassifierFGBG_Process_16Bit extends AbstractClassifier_16Bit {
 			applyedM.show("masked");
 		}
 		// ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, false, "label", false); // back => Float.MAX_VALUE
-		ARFFProcessor.createTrainingDataSet(fgbg, Float.MAX_VALUE, f, numberofsamples, arffFileName, false, "fgbg");
+		ARFFProcessor.createTrainingDataSet(fgbg, Settings.back, f, numberofsamples, arffFileName, false, "fgbg"); // Float.MAX_VALUE
 	}
 	
 	private ImageStack[] getFGBG(ImageStack applyedM) {
