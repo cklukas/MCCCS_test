@@ -23,7 +23,7 @@ public class Quantify {
 	
 	public static void main(String[] args) throws Exception {
 		{
-			new Settings(false);
+			new Settings(true);
 		}
 		if (args == null || args.length == 0) {
 			System.err.println("No filenames provided as parameters! Return Code 1");

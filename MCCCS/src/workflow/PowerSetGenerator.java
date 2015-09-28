@@ -65,6 +65,7 @@ public class PowerSetGenerator {
 					isl[0].initLabels();
 					isl[0] = isl[0].getBinaryPowerSet(1);
 					
+					// roi.show("roi");
 					for (Image iii : isl[0].getImages()) {
 						String name = iii.getFileName();
 						iii = iii.io().applyMask(roi).getImage();

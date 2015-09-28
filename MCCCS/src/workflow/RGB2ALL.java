@@ -2,6 +2,7 @@ package workflow;
 
 import ij.ImagePlus;
 import ij.process.FloatProcessor;
+import ij.process.ShortProcessor;
 
 import java.io.File;
 import java.io.IOException;
@@ -119,15 +120,21 @@ public class RGB2ALL {
 	}
 	
 	private static float[] getFloat(Image r) {
+		// check for 32 bit
 		if (r.getAsImagePlus().getProcessor() instanceof FloatProcessor)
 			return r.getAs1float();
-		else {
-			int[] inta = r.getAs1Ar();
-			float[] res = new float[inta.length];
-			for (int i = 0; i < inta.length; i++) {
-				res[i] = inta[i];
+		else
+			// check for 16 bit
+			if (r.getAsImagePlus().getProcessor() instanceof ShortProcessor)
+				return new Image((new ImagePlus("32-bit", r.getAsImagePlus().getProcessor().convertToFloat()))).getAs1float();
+			// 8 bit
+			else {
+				int[] inta = r.getAs1Ar();
+				float[] res = new float[inta.length];
+				for (int i = 0; i < inta.length; i++) {
+					res[i] = inta[i];
+				}
+				return res;
 			}
-			return res;
-		}
 	}
 }

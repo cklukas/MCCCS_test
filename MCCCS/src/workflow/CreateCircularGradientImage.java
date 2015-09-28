@@ -15,7 +15,7 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author klukas
  */
 public class CreateCircularGradientImage {
-
+	
 	public static void main(String[] args) throws Exception {
 		// {
 		// new Settings(true);
@@ -23,7 +23,8 @@ public class CreateCircularGradientImage {
 		if (args == null || args.length < 2) {
 			System.err.println("Invalid parameters provided! See examples for proper use.");
 			System.err.println("Example 1: gradient from center of image, center is calculated from input file: CreateCircularGradientImage inp.png output.png");
-			System.err.println("Example 2: gradient from griven center point(120;120), output size 640x480: CreateCircularGradientImage 120 120 640 480 output.png");
+			System.err
+					.println("Example 2: gradient from griven center point(120;120), output size 640x480: CreateCircularGradientImage 120 120 640 480 output.png");
 			System.err
 					.println("Example 3: gradient from center of gravity of input image, considering pixels up to 70% of max distance from center point: CreateCircularGradientImage inp.png output.png auto 0.7");
 			System.err
@@ -61,16 +62,16 @@ public class CreateCircularGradientImage {
 							invert = true;
 						double maxAllowed = Double.parseDouble(args[3]);
 						maxDist = Math.sqrt(w / 2 * w / 2 + h / 2 * h / 2) * maxAllowed;
-
+						
 						double sumGray = 0;
 						float[][] imgf = get2d(w, h, img.getAs1float());
-
+						
 						if (invert) {
 							for (int x = 0; x < w; x++)
 								for (int y = 0; y < h; y++)
 									imgf[x][y] = -imgf[x][y];
 						}
-
+						
 						{
 							float min = Float.MAX_VALUE;
 							for (int x = 0; x < w; x++)
@@ -81,7 +82,7 @@ public class CreateCircularGradientImage {
 								for (int y = 0; y < h; y++)
 									imgf[x][y] = imgf[x][y] - min;
 						}
-
+						
 						for (int x = 0; x < w; x++) {
 							for (int y = 0; y < h; y++) {
 								double dist = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy));
@@ -141,14 +142,14 @@ public class CreateCircularGradientImage {
 				for (int y = 0; y < h; y++) {
 					gradient[x][y] = 1f - (float) (Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy)) / maxDist);
 				}
-			new Image(gradient).saveToFile(args[offTargetFile + 1]);
+			new Image(gradient).saveToFile(args[offTargetFile + 2]);
 		}
 	}
-
+	
 	public static float[][] get2d(int w, int h, float[] as1a) {
 		if (w * h != as1a.length)
 			throw new IllegalArgumentException("width * height not equal to source length");
-
+		
 		float[][] image = new float[w][h];
 		int idx = 0;
 		for (int y = 0; y < h; y++) {

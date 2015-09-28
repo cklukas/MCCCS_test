@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import org.graffiti.plugin.algorithm.ThreadSafeOptions;
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
 import tools.PolynomialFitter;
@@ -50,7 +49,7 @@ public class SideSmooth {
 					fl.add(f);
 				}
 				
-				ThreadSafeOptions resAll = new ThreadSafeOptions();
+				// ThreadSafeOptions resAll = new ThreadSafeOptions();
 				Image all = null;
 				boolean first = true;
 				// fl.parallelStream().forEach((f) -> {

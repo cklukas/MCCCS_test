@@ -44,8 +44,9 @@ public class Split {
 					Image i = new Image(FileSystemHandler.getURL(f));
 					int[] ipix = i.getAs1A();
 					Roi bb = i.io().getBoundingBox();
-					int minh = bb.getBounds().height;
-					Segmentation ps = new ClusterDetection(i, Settings.back);
+					int minh = (int) (bb.getBounds().height * 0.90);
+					int esize = (int) (minh * 0.02);
+					Segmentation ps = new ClusterDetection(i.io().bm().erode(esize).getImage(), Settings.back);
 					ps.detectClusters();
 					// ps.getClusterImage().show("cluster image");
 					LinkedList<Integer> validClusterIDs = new LinkedList<>();

@@ -27,16 +27,25 @@ public class SplitRGB {
 			System.exit(1);
 		} else {
 			for (String a : args) {
-				File f = new File(a);
-				if (!f.exists()) {
-					System.err.println("File '" + a + "' could not be found! Return Code 2");
-					System.exit(2);
+			File f = new File(a);
+			if (!f.exists()) {
+				System.err.println("File '" + a + "' could not be found! Return Code 2");
+				System.exit(2);
+			} else {
+				// get file type
+				String name = f.getName();
+				String f_ending = name.split("\\.")[1];
+				Image i = new Image(FileSystemHandler.getURL(f));
+				if (f_ending.equals("tif") || f_ending.equals("tiff")) {
+					i.io().channels().get(Channel.RGB_R).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_r." + f_ending, ImageType.GRAY32);
+					i.io().channels().get(Channel.RGB_G).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_g." + f_ending, ImageType.GRAY32);
+					i.io().channels().get(Channel.RGB_B).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_b." + f_ending, ImageType.GRAY32);
 				} else {
-					Image i = new Image(FileSystemHandler.getURL(f));
-					i.io().channels().get(Channel.RGB_R).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_r.tif", ImageType.GRAY32);
-					i.io().channels().get(Channel.RGB_G).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_g.tif", ImageType.GRAY32);
-					i.io().channels().get(Channel.RGB_B).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_b.tif", ImageType.GRAY32);
+					i.io().channels().get(Channel.RGB_R).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_r." + f_ending);
+					i.io().channels().get(Channel.RGB_G).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_g." + f_ending);
+					i.io().channels().get(Channel.RGB_B).getImage().saveToFile(f.getParent() + File.separator + "channel_rgb_b." + f_ending);
 				}
+			}
 			}
 		}
 	}

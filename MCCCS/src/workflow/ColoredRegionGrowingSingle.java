@@ -34,7 +34,7 @@ public class ColoredRegionGrowingSingle {
 			int uncolored = Color.WHITE.getRGB();
 			int[][] ia = img.getAs2A();
 			int[][] it = img.getAs2A();
-			img.io().stat().printColorCodes(true);
+			img.io().stat().printColorCodes(false);
 			
 			Image i2 = new Image(ia);
 			
