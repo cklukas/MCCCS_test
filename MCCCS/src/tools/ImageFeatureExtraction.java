@@ -52,18 +52,18 @@ public class ImageFeatureExtraction {
 			res.put(FeatureMode.MEDIAN.name(), img);
 			if (br)
 				break;
-			case TEXTURE:
-			ImageStack is = calcTextureForVizualization(img.io(), masksize);
-			int idx = 1;
-			for (ImageProcessor i : is) {
-				// use Median filter to suppress noise (may caused by discontinuities)
-				RankFilters rf2 = new RankFilters();
-				rf2.rank(i, 2, RankFilters.MEDIAN);
-				Image filteredImage = new Image(i).io().getImage();
-				res.put(FeatureMode.TEXTURE.name() + "_" + is.getImageLabel(idx++), filteredImage);
-			}
-			if (br)
-				break;
+//			case TEXTURE:
+//			ImageStack is = calcTextureForVizualization(img.io(), masksize);
+//			int idx = 1;
+//			for (ImageProcessor i : is) {
+//				// use Median filter to suppress noise (may caused by discontinuities)
+//				RankFilters rf2 = new RankFilters();
+//				rf2.rank(i, 2, RankFilters.MEDIAN);
+//				Image filteredImage = new Image(i).io().getImage();
+//				res.put(FeatureMode.TEXTURE.name() + "_" + is.getImageLabel(idx++), filteredImage);
+//			}
+//			if (br)
+//				break;
 			case HARLICK:
 			ImageStack iss = runHarlick(img, masksize);
 			int idxx = 1;
@@ -102,20 +102,20 @@ public class ImageFeatureExtraction {
 		int[] temp = new int[masksize * masksize];
 		final int f_masksize = masksize;
 		
-		String[] harlickNames = { "Angular 2nd moment",
+		String[] harlickNames = { "Angular_Second_Moment",
 			"Contrast",
 			"Correlation",
-			"variance",
-			"Inverse Difference Moment",
-			"Sum Average",
-			"Sum Variance",
-			"Sum Entropy",
+			"Variance",
+			"Inverse_Difference_Moment",
+			"Sum_Average",
+			"Sum_Variance",
+			"Sum_Entropy",
 			"Entropy",
-			"Difference Variance",
-			"Difference Entropy",
-			"Information Measures of Correlation",
-			"Information Measures of Correlation",
-			"Maximum Correlation",
+			"Difference_Variance",
+			"Difference_Entropy",
+			"Information_Measures_of_Correlation_1",
+			"Information_Measures_of_Correlation_2",
+			"Maximum_Correlation",
 			"Coefficient" };
 			
 		HashMap<String, double[][]> results = new HashMap<String, double[][]>();
@@ -154,9 +154,7 @@ public class ImageFeatureExtraction {
 					
 					// obtain the features
 					List<double[]> features = descriptor.getFeatures();
-					
-					// print the features to system out
-					
+									
 					for (double[] feature : features) {
 						for (int idx = 0; idx < feature.length; idx++)
 						results.get(harlickNames[idx])[x][y] = feature[idx];
