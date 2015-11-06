@@ -76,13 +76,14 @@ public class ImageFeatureExtraction {
 			}
 			if (br)
 				break;
+			//TODO implement Gabor Filter
 			case GABOR:
 			Gabor dd = new Gabor();
 			dd.run(img.getAsImagePlus().getProcessor());
 			System.out.println(dd.getDescription());
 			List<double[]> features = dd.getFeatures();
 			for (double[] ddd : features) {
-				System.out.println(Arrays.toString(ddd));
+				// System.out.println(Arrays.toString(ddd));
 			}
 			
 			dd.getLireFeature();
