@@ -1,6 +1,5 @@
 package tools;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +17,7 @@ import de.ipk.ag_ba.image.operation.ImageOperation;
 import de.ipk.ag_ba.image.operation.ImageTexture;
 import de.ipk.ag_ba.image.structures.Image;
 import de.ipk.ag_ba.image.structures.ImageStack;
+import de.lmu.ifi.dbs.jfeaturelib.edgeDetector.Kirsch;
 import de.lmu.ifi.dbs.jfeaturelib.features.Gabor;
 import de.lmu.ifi.dbs.jfeaturelib.features.Haralick;
 import ij.ImagePlus;
@@ -36,47 +36,42 @@ public class ImageFeatureExtraction {
 			case ALL:
 			br = false;
 			case SHARPEN:
-			ImagePlus imgp = img.getAsImagePlus();
+			ImagePlus imgp = img.copy().getAsImagePlus();
 			imgp.getProcessor().sharpen();
 			res.put(FeatureMode.SHARPEN.name(), new Image(imgp));
 			if (br)
 				break;
 			case BLUR:
-			img.getAsImagePlus().getProcessor().blurGaussian(parm_sigma);
+			img.copy().getAsImagePlus().getProcessor().blurGaussian(parm_sigma);
 			res.put(FeatureMode.BLUR.name(), img);
 			if (br)
 				break;
 			case MEDIAN:
 			RankFilters rf = new RankFilters();
-			rf.rank(img.getAsImagePlus().getProcessor(), masksize, RankFilters.MEDIAN);
+			rf.rank(img.copy().getAsImagePlus().getProcessor(), masksize, RankFilters.MEDIAN);
 			res.put(FeatureMode.MEDIAN.name(), img);
 			if (br)
 				break;
-//			case TEXTURE:
-//			ImageStack is = calcTextureForVizualization(img.io(), masksize);
-//			int idx = 1;
-//			for (ImageProcessor i : is) {
-//				// use Median filter to suppress noise (may caused by discontinuities)
-//				RankFilters rf2 = new RankFilters();
-//				rf2.rank(i, 2, RankFilters.MEDIAN);
-//				Image filteredImage = new Image(i).io().getImage();
-//				res.put(FeatureMode.TEXTURE.name() + "_" + is.getImageLabel(idx++), filteredImage);
-//			}
-//			if (br)
-//				break;
 			case HARLICK:
-			ImageStack iss = runHarlick(img, masksize);
-			int idxx = 1;
-			for (ImageProcessor i : iss) {
+			ImageStack is = runHarlick(img, masksize);
+			int idx = 1;
+			for (ImageProcessor i : is) {
 				// use Median filter to suppress noise (may caused by discontinuities)
 				RankFilters rf2 = new RankFilters();
 				rf2.rank(i, 2, RankFilters.MEDIAN);
 				Image filteredImage = new Image(i).io().getImage();
-				res.put(FeatureMode.HARLICK.name() + "_" + iss.getImageLabel(idxx++), filteredImage);
+				res.put(FeatureMode.HARLICK.name() + "_" + is.getImageLabel(idx++), filteredImage);
 			}
 			if (br)
 				break;
-			//TODO implement Gabor Filter
+			case KIRSCH:
+			Kirsch kirschdetector = new Kirsch();
+			ImageProcessor kimg = img.copy().getAsImagePlus().getProcessor();
+			kirschdetector.run(kimg);
+			res.put(FeatureMode.KIRSCH.name(), new Image(kimg));
+			if (br)
+				break;
+			// TODO implement Gabor Filter
 			case GABOR:
 			Gabor dd = new Gabor();
 			dd.run(img.getAsImagePlus().getProcessor());
@@ -155,7 +150,7 @@ public class ImageFeatureExtraction {
 					
 					// obtain the features
 					List<double[]> features = descriptor.getFeatures();
-									
+					
 					for (double[] feature : features) {
 						for (int idx = 0; idx < feature.length; idx++)
 						results.get(harlickNames[idx])[x][y] = feature[idx];
@@ -279,6 +274,6 @@ public class ImageFeatureExtraction {
 	}
 	
 	public enum FeatureMode {
-		SHARPEN, BLUR, MEDIAN, TEXTURE, HARLICK, GABOR, ALL
+		SHARPEN, BLUR, MEDIAN, TEXTURE, HARLICK, KIRSCH, GABOR, ALL
 	}
 }
