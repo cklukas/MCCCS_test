@@ -530,8 +530,16 @@ public class ARFFProcessor {
 		int idxClass = 0;
 		boolean combinedReady = false;
 		
-		ArrayList<Color> colorsAL = Colors.get(Settings.numberOfClasses, 1);
-		int[] colors = new int[colorsAL.size()];
+		int[] colors = new int[Settings.numberOfClasses];
+		ArrayList<Color> colorsAL = new ArrayList<Color>();
+		
+		// in case of 2 classes use FGBG colors
+		if(Settings.numberOfClasses > 2) {
+			colorsAL = Colors.get(Settings.numberOfClasses, 1);
+		} else {
+			colorsAL.add(new Color(Settings.foreground));
+			colorsAL.add(new Color(Settings.back));
+		}
 		
 		int idx = 0;
 		for (Color c : colorsAL)
