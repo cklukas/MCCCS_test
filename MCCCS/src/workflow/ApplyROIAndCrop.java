@@ -3,12 +3,14 @@ package workflow;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import ij.ImagePlus;
 import ij.io.FileSaver;
 import ij.process.FloatProcessor;
 
 /**
- * Apply a mask to given an image and return a cropped version with specified name (target file).
+ * Apply a mask to given an image and return a cropped version with specified name (target file) and extension (file format).
  * 
  * @author Jean-Michel Pape
  */
@@ -17,13 +19,15 @@ public class ApplyROIAndCrop {
 		{
 			new Settings();
 		}
-		if (args == null || args.length != 3) {
-			System.err.println("Params: [image] [mask] [target file] ! Return Code 1");
+		if (args == null || args.length != 4) {
+			System.err.println("Params: [image] [mask] [target file name] [file format] ! Return Code 1");
 			System.exit(1);
 		} else {
 			File f_img = new File(args[0]);
 			File f_mask = new File(args[1]);
 			File f_out = new File(args[2]);
+			String fileextension = args[3];
+			
 			if (f_out.exists()) {
 			System.err.println("Error - Output target file  '" + f_out.getName() + "' already exists! Return Code 2");
 			System.exit(2);
@@ -76,10 +80,19 @@ public class ApplyROIAndCrop {
 					
 					FloatProcessor out_proc = new FloatProcessor(out_f);
 					ImagePlus out = new ImagePlus("crop", out_proc);
-					// out.setRoi
-					// ByteProcessor proc = new ByteProcessor(w, h, pix, null);
 					
-					new FileSaver(out).saveAsTiff(f_out.getAbsolutePath());
+					switch (fileextension) {
+					case "tif":
+						new FileSaver(out).saveAsTiff(f_out.getAbsolutePath());
+						break;
+					case "png":
+						new FileSaver(out).saveAsPng(f_out.getAbsolutePath());
+						break;
+					default:
+						throw new NotImplementedException("File extension is not suported!");
+						//break;
+					}
+					
 				}
 		}
 	}
