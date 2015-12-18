@@ -1,6 +1,5 @@
 package workflow;
 
-import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 
@@ -57,61 +56,58 @@ public class ApplyROIAndCrop {
 					
 					for (int x = 0; x < img_ip.getWidth(); x++) {
 						for (int y = 0; y < img_ip.getHeight(); y++) {
-							if (mask_f[x][y] == Settings.back_16 || mask_f[x][y] ==  -1.0) {
-								img_f[x][y] = Settings.back_16;
-							} else {
-								if (x > max_x)
-									max_x = x;
-								if (x < min_x)
-									min_x = x;
-								if (y > max_y)
-									max_y = y;
-								if (y < min_y)
-									min_y = y;
+						if (mask_f[x][y] == Settings.back_16 || mask_f[x][y] == -1.0) {
+							img_f[x][y] = Settings.back_16;
+						} else {
+							if (x > max_x)
+								max_x = x;
+							if (x < min_x)
+								min_x = x;
+							if (y > max_y)
+								max_y = y;
+							if (y < min_y)
+								min_y = y;
 								
-								// img has content?
-								if(img_f[x][y] != Settings.back_16 && img_f[x][y] != -1.0) {
-									imgHasContent = true;
-									System.out.println(img_f[x][y]);
-								}
+							// img has content?
+							if (img_f[x][y] != Settings.back_16 && img_f[x][y] != -1.0) {
+								imgHasContent = true;
+								// System.out.println(img_f[x][y]);
 							}
+						}
 						}
 					}
 					
 					// crop image
-					float[][] out_f = new float[max_x - min_x +1][max_y - min_y +1];
+					float[][] out_f = new float[max_x - min_x + 1][max_y - min_y + 1];
 					
 					// check if img has content
-					if(!imgHasContent) {
+					if (!imgHasContent) {
 						for (int x = min_x; x < max_x; x++) {
-							for (int y = min_y; y < max_y; y++) {
-								out_f[x - min_x][y - min_y] = Color.WHITE.getRGB();
-							}
+						for (int y = min_y; y < max_y; y++) {
+							out_f[x - min_x][y - min_y] = Float.MAX_VALUE;
+						}
 						}
 					} else {
 						for (int x = min_x; x < max_x; x++) {
-							for (int y = min_y; y < max_y; y++) {
-								out_f[x - min_x][y - min_y] = img_f[x][y];
-							}
+						for (int y = min_y; y < max_y; y++) {
+							out_f[x - min_x][y - min_y] = img_f[x][y];
+						}
 						}
 					}
 					
 					FloatProcessor out_proc = new FloatProcessor(out_f);
 					ImagePlus out = new ImagePlus("crop", out_proc);
 					
-					img_ip.show();
-					out.show();
-					
 					switch (fileextension) {
-					case "tif":
+						case "tif":
 						new FileSaver(out).saveAsTiff(f_out.getAbsolutePath());
 						break;
-					case "png":
+						case "png":
 						new FileSaver(out).saveAsPng(f_out.getAbsolutePath());
 						break;
-					default:
+						default:
 						throw new NotImplementedException("File extension is not suported!");
-						//break;
+						// break;
 					}
 					
 				}
