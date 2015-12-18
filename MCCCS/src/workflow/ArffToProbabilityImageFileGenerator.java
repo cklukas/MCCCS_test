@@ -5,8 +5,8 @@ import java.util.LinkedList;
 
 import org.graffiti.plugin.io.resources.FileSystemHandler;
 
-import tools.ARFFProcessor;
 import de.ipk.ag_ba.image.structures.Image;
+import tools.ARFFProcessor;
 
 /**
  * Converts classified ARFF result file (including pixel-probabilities for each class) to an grayscale-image (use of FG mask is possible).
@@ -19,9 +19,10 @@ public class ArffToProbabilityImageFileGenerator {
 		{
 			new Settings(true);
 		}
-		if (args == null || args.length < 2) {
+		if (args == null || args.length < 3) {
 			System.err
-					.println("No parameter for [channel-count (png output), -channel-count (negative for float tiff output)] and / or [percentage of acceptance (0 .. 1)] and / or no [filenames] provided as parameters! Return Code 1");
+				.println(
+						"No parameter for [channel-count (png output), -channel-count (negative for float tiff output)] and / or [percentage of acceptance (0 .. 1)] and / or no [filenames] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			int parmCount = 0;
