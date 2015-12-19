@@ -70,7 +70,7 @@ public class ArffFromImageFileGenerator {
 					ARFFProcessor ac = new ARFFProcessor();
 					
 					String name;
-					// remove file-ending if it is directory
+					// remove file-ending if it is not a directory
 					if (!f.isDirectory()) {
 						String name2 = f.getName();
 						String[] split = name2.split("\\.");
