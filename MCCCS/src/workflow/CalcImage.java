@@ -28,7 +28,7 @@ public class CalcImage {
 		}
 		if (args == null || args.length != 5) {
 			System.err.println(
-				"Params: [image A (float)] [image B (float)] [target file] [-,+,*,/,absdiff,max,min,logratio, and] [Mode: 1 - float, 2 - RGB] ! Return Code 1");
+					"Params: [image A (float)] [image B (float)] [target file] [-,+,*,/,absdiff,max,min,logratio, and] [Mode: 1 - float, 2 - RGB] ! Return Code 1");
 			System.exit(1);
 		} else {
 			File f_a = new File(args[0]);
@@ -38,51 +38,51 @@ public class CalcImage {
 			String arg4 = args[4];
 			Operation op = null;
 			if (arg3.equals("-"))
-			op = Operation.minus;
+				op = Operation.minus;
 			if (arg3.equals("+"))
-			op = Operation.plus;
+				op = Operation.plus;
 			if (arg3.equals("*"))
-			op = Operation.times;
+				op = Operation.times;
 			if (arg3.equals("/"))
-			op = Operation.divide;
+				op = Operation.divide;
 			if (arg3.equalsIgnoreCase("absdiff"))
-			op = Operation.absolute_of_difference;
+				op = Operation.absolute_of_difference;
 			if (arg3.equalsIgnoreCase("max"))
-			op = Operation.max;
+				op = Operation.max;
 			if (arg3.equalsIgnoreCase("min"))
-			op = Operation.min;
+				op = Operation.min;
 			if (arg3.equalsIgnoreCase("logratio"))
-			op = Operation.logratio;
+				op = Operation.logratio;
 			if (arg3.equalsIgnoreCase("AND"))
-			op = Operation.and;
+				op = Operation.and;
 			if (op == null) {
-			System.err.println("Error - Operation  '" + args[3] + "' is unknown! Return Code 3");
-			System.exit(3);
+				System.err.println("Error - Operation  '" + args[3] + "' is unknown! Return Code 3");
+				System.exit(3);
 			}
 			if (f_out.exists()) {
-			System.err.println("Error - Output target file  '" + f_out.getName() + "' already exists! Return Code 2");
-			System.exit(2);
+				System.err.println("Error - Output target file  '" + f_out.getName() + "' already exists! Return Code 2");
+				System.exit(2);
 			} else
-			if (!f_a.exists()) {
-				System.err.println("File image A '" + f_a.getName() + "' could not be found! Return Code 4");
-				System.exit(4);
-			} else {
-				if (!f_b.exists()) {
-					System.err.println("File image B '" + f_b.getName() + "' could not be found! Return Code 5");
-					System.exit(5);
+				if (!f_a.exists()) {
+					System.err.println("File image A '" + f_a.getName() + "' could not be found! Return Code 4");
+					System.exit(4);
 				} else {
-					Image imgA = new Image(FileSystemHandler.getURL(f_a));
-					Image imgB = new Image(FileSystemHandler.getURL(f_b));
-					
-					if (arg4.matches("1")) {
-						float[] out = processFloat(op, imgA, imgB);
-						new Image(imgA.getWidth(), imgA.getHeight(), out).saveToFile(f_out.getPath());
+					if (!f_b.exists()) {
+						System.err.println("File image B '" + f_b.getName() + "' could not be found! Return Code 5");
+						System.exit(5);
 					} else {
-						ImagePlus out = processRGB(op, imgA, imgB);
-						new Image(out).saveToFile(f_out.getPath());
+						Image imgA = new Image(FileSystemHandler.getURL(f_a));
+						Image imgB = new Image(FileSystemHandler.getURL(f_b));
+						
+						if (arg4.matches("1")) {
+							float[] out = processFloat(op, imgA, imgB);
+							new Image(imgA.getWidth(), imgA.getHeight(), out).saveToFile(f_out.getPath());
+						} else {
+							ImagePlus out = processRGB(op, imgA, imgB);
+							new Image(out).saveToFile(f_out.getPath());
+						}
 					}
 				}
-			}
 		}
 	}
 	
@@ -130,41 +130,41 @@ public class CalcImage {
 		float[] out = new float[imgAf.length];
 		switch (op) {
 			case logratio:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = (float) (Math.log(imgAf[i]) - Math.log(imgBf[i]));
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = (float) (Math.log(imgAf[i]) - Math.log(imgBf[i]));
+				break;
 			case max:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = Math.max(imgAf[i], imgBf[i]);
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = Math.max(imgAf[i], imgBf[i]);
+				break;
 			case min:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = Math.min(imgAf[i], imgBf[i]);
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = Math.min(imgAf[i], imgBf[i]);
+				break;
 			case absolute_of_difference:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = Math.abs(imgAf[i] - imgBf[i]);
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = Math.abs(imgAf[i] - imgBf[i]);
+				break;
 			case divide:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = imgAf[i] / imgBf[i];
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = imgAf[i] / imgBf[i];
+				break;
 			case minus:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = imgAf[i] - imgBf[i];
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = imgAf[i] - imgBf[i];
+				break;
 			case plus:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = imgAf[i] + imgBf[i];
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = imgAf[i] + imgBf[i];
+				break;
 			case times:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = imgAf[i] * imgBf[i];
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = imgAf[i] * imgBf[i];
+				break;
 			case and:
-			for (int i = 0; i < imgAf.length; i++)
-				out[i] = (int) imgAf[i] & (int) imgBf[i];
-			break;
+				for (int i = 0; i < imgAf.length; i++)
+					out[i] = (int) imgAf[i] & (int) imgBf[i];
+				break;
 		}
 		return out;
 	}

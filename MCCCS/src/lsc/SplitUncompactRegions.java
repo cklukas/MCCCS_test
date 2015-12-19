@@ -24,15 +24,16 @@ import de.ipk.ag_ba.image.structures.Image;
  * @author Christian Klukas
  */
 public class SplitUncompactRegions {
-
+	
 	public static void main(String[] args) throws Exception {
-
+		
 		boolean debug = true;
 		{
 			new Settings(false);
 		}
 		if (args == null || args.length != 3) {
-			System.err.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point)] provided as parameters! Return Code 1");
+			System.err
+					.println("No parameter [8 bit rgb, colored input image] [result image] [target count (may be floating point)] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			Image img = new Image(FileSystemHandler.getURL(new File(args[0])));
@@ -40,7 +41,7 @@ public class SplitUncompactRegions {
 			int w = img.getWidth();
 			int h = img.getHeight();
 			int[][] ia = img.getAs2A();
-
+			
 			// enumerate region pixels
 			HashMap<Integer, ArrayList<Vector2i>> color2region = new HashMap<Integer, ArrayList<Vector2i>>();
 			findRegions(w, h, ia, color2region);
@@ -62,23 +63,23 @@ public class SplitUncompactRegions {
 						}
 					}
 				}
-
+				
 				// calculate compactness of regions
 				HashMap<Integer, Double> color2compactness = new HashMap<Integer, Double>();
 				for (int color : color2region.keySet()) {
 					ArrayList<Vector2i> region = color2region.get(color);
 					ArrayList<Vector2i> regionOutline = color2regionOutline.get(color);
-
+					
 					int borderPixels = regionOutline.size();
 					int filledArea = region.size();
-
+					
 					double c = (borderPixels * borderPixels / filledArea); // 4
-																			// *
-																			// Math.PI
-																			// /
+					// *
+					// Math.PI
+					// /
 					color2compactness.put(color, c);
 				}
-
+				
 				// select split regions, greedy, select the region which is most
 				// uncompact.
 				double minCompactness = Double.MAX_VALUE;
@@ -92,7 +93,7 @@ public class SplitUncompactRegions {
 						colorOfRegionWithMinimumCompactness = color;
 					}
 				}
-
+				
 				// split along a straight line, so that the two regions
 				// compactness is maximized
 				if (colorOfRegionWithMinimumCompactness == null) {
@@ -112,7 +113,8 @@ public class SplitUncompactRegions {
 						idxB++;
 						if (startP.distance(endP) < 3)
 							continue;
-						double c = splitRegionGetCompactnessSum(colorOfRegionWithMinimumCompactness, color2region, color2regionOutline, startP, endP, ia, false, maxComp);
+						double c = splitRegionGetCompactnessSum(colorOfRegionWithMinimumCompactness, color2region, color2regionOutline, startP, endP, ia, false,
+								maxComp);
 						if (c > maxComp) {
 							System.out.print(startP + " ==> " + endP + " (" + idxA + " / " + idxB + "): ");
 							System.out.println(" " + c);
@@ -122,29 +124,29 @@ public class SplitUncompactRegions {
 						}
 					}
 				}
-
+				
 				if (bestStartP == null) {
 					System.out.println("Found no split line for region with lowest compactness. Can't continue processing.");
 					System.exit(0);
 				}
-
+				
 				Vector2i startP = new Vector2i(300, 74);
 				Vector2i endP = new Vector2i(280, 117);
 				System.out.print("AAA: " + startP + " ==> " + endP + " (" + idxA + " / " + idxB + "): ");
 				double c = splitRegionGetCompactnessSum(colorOfRegionWithMinimumCompactness, color2region, color2regionOutline, bestStartP, bestEndP, ia, false, 0);
 				System.out.println(" " + c);
-
+				
 				System.out.print("BBB: " + bestStartP + " ==> " + bestEndP + " (" + idxA + " / " + idxB + "): ");
 				c = splitRegionGetCompactnessSum(colorOfRegionWithMinimumCompactness, color2region, color2regionOutline, bestStartP, bestEndP, ia, true, 0);
 				System.out.println(" " + c);
 				img = new Image(ia);
 				findRegions(w, h, ia, color2region);
 			}
-
+			
 			new Image(ia).saveToFile(args[1]);
 		}
 	}
-
+	
 	private static double splitRegionGetCompactnessSum(Integer colorOfRegionWithMinimumCompactness, HashMap<Integer, ArrayList<Vector2i>> color2region,
 			HashMap<Integer, ArrayList<Vector2i>> color2regionOutline, Vector2i bestStartP, Vector2i bestEndP, int[][] ia, boolean doIt, double printTh) {
 		// position = sign( (Bx-Ax)*(Y-Ay) - (By-Ay)*(X-Ax) )
@@ -159,14 +161,14 @@ public class SplitUncompactRegions {
 		Color cB = Color.getHSBColor(hsv[0], hsv[1], hsv[2] * 0.85f);
 		int colA = cA.getRGB();
 		int colB = cB.getRGB();
-
+		
 		if (color2region.containsKey(colA) || color2region.containsKey(colB)) {
 			System.out.println("At least one region split color is already in the image. "
 					+ "Another color should be determined, but currently can't be determined (not yet implemented)! " + "Need to abort processing. Error Code 1.");
 			System.exit(1);
-
+			
 		}
-
+		
 		ArrayList<Vector2i> line = drawLine(bestStartP, bestEndP);
 		Vector2i A = bestStartP;
 		Vector2i B = bestEndP;
@@ -207,7 +209,7 @@ public class SplitUncompactRegions {
 		outlineB += line.size() - 2;
 		// areaA = areaA - line.size() + 2;
 		// areaB = areaB - line.size() + 2;
-
+		
 		double compactnessA = 4 * Math.PI / (outlineA * outlineA / (double) areaA); // 4
 		// *
 		// Math.PI
@@ -217,11 +219,12 @@ public class SplitUncompactRegions {
 		// Math.PI
 		// /
 		if (compactnessA + compactnessB > printTh)
-			System.out.print("C0/1: " + compactnessA + " / " + compactnessB + " Outline 0/1: " + outlineA + " / " + outlineB + " AREA 0/1: " + areaA + " / " + areaB + " = "
+			System.out.print("C0/1: " + compactnessA + " / " + compactnessB + " Outline 0/1: " + outlineA + " / " + outlineB + " AREA 0/1: " + areaA + " / "
+					+ areaB + " = "
 					+ (areaA + areaB) + " ");
 		return Math.min(compactnessA, compactnessB);
 	}
-
+	
 	// position = sign( (Bx-Ax)*(Y-Ay) - (By-Ay)*(X-Ax) )
 	// ==> -1 / 0 on line / +1
 	public static ArrayList<Vector2i> drawLine(Vector2i a, Vector2i b) {
@@ -250,7 +253,7 @@ public class SplitUncompactRegions {
 		}
 		return line;
 	}
-
+	
 	private static void findRegions(int w, int h, int[][] ia, HashMap<Integer, ArrayList<Vector2i>> color2region) {
 		color2region.clear();
 		for (int x = 0; x < w; x++) {
@@ -264,15 +267,16 @@ public class SplitUncompactRegions {
 			}
 		}
 	}
-
+	
 	private static int neighbourCountDifferentToColor(int color, Vector2i pix, int[][] img, int w, int h) {
 		int found = 0;
 		for (int x = pix.x - 1; x <= pix.x + 1; x++) {
 			for (int y = pix.y - 1; y <= pix.y + 1; y++) {
 				if (x < 0 || y < 0 || x >= w || y >= h) {
 					found++; // treat image border as border of region
-				} else if (img[x][y] != color)
-					found++;
+				} else
+					if (img[x][y] != color)
+						found++;
 			}
 		}
 		return found;
