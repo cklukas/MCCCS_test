@@ -485,7 +485,9 @@ public class ARFFProcessor {
 						if (val.contains("class")) {
 						break;
 						} else
-						classPosIdx++;
+						// check for overflow (in case of class string missing, but information is at last position)
+						if (classPosIdx < (s.length - 1))
+							classPosIdx++;
 					}
 					if (s.length > 0 && mask[x][y] != Settings.back) {
 						int cls = Integer.parseInt(StringManipulationTools
