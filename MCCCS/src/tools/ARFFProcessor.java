@@ -733,4 +733,79 @@ public class ARFFProcessor {
 		}
 		
 	}
+	
+	/**
+	 * Reads a single channel image and creates Arff file.
+	 * 
+	 * @param ip
+	 * @param path
+	 * @param name
+	 * @param mask_img
+	 * @param b
+	 * @throws IOException
+	 */
+	public void convertImagesToArffNG(ImagePlus ip, String path, String name, Image mask_img, boolean b) throws IOException {
+		boolean checkMask = mask_img == null ? false : true;
+		
+		int[] mask = null;
+		int background = 0;
+		if (checkMask) {
+			mask = mask_img.getAs1A();
+			background = Settings.back;
+		}
+		
+		String attributes = "";
+		
+		for (int i = 0; i < 1; i++) {
+			attributes += "@attribute " + makeNice(ip.getTitle())
+				+ "\tNUMERIC\n";
+		}
+		
+		int numberOfDiseaseClasses = Settings.numberOfClasses;
+		
+		attributes += "@attribute class\t{";
+		for (int idx = 0; idx < numberOfDiseaseClasses; idx++) {
+			if (idx < numberOfDiseaseClasses - 1)
+			attributes += ("class" + idx + ",");
+			else
+			attributes += ("class" + idx);
+		}
+		attributes += "}\n";
+		
+		String header = "%\n" + "@relation '" + name + "'\n" + attributes
+			+ "@data\n";
+			
+		float[][] XY = ip.getProcessor().getFloatArray();
+		
+		int width = XY.length;
+		int height = XY[0].length;
+		
+		String line = "";
+		
+		FileWriter fw = new FileWriter(new File(path + "/" + name + ".arff"),
+			false);
+			
+		fw.write(header);
+		
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+			if (checkMask)
+				if (mask[x + y * width] == background)
+					continue;
+					
+			line += XY[x][y] + ",";
+			
+			if (line.length() > 0) {
+				// appends the string to the file
+				fw.write(line + "?" + "\n");
+				// .add(line + "; x: " + x + ", y: " + y);
+				line = "";
+			}
+			}
+		}
+		
+		fw.write("%");
+		fw.close();
+		
+	}
 }

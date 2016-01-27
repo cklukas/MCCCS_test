@@ -173,7 +173,7 @@ public class IO_MCCCS {
 		out.close();
 	}
 	
-	private enum ReadMode {
+	public enum ReadMode {
 		IMAGES, MASKS, GROUNDTRUTH, GROUNDTRUTH_USER;
 		
 		String getMode() {
