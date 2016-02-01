@@ -34,7 +34,7 @@ public class ARFFcontent {
 						String rn = l.substring(l.indexOf("@relation") + "@relation".length());
 						rn = rn.trim();
 						if (rn.startsWith("'"))
-							rn = rn.substring(1, rn.length() - 2);
+							rn = rn.substring(1, rn.length() - 1);
 						if (relationName.length() > 0)
 							relationName += "_";
 						relationName += rn;
@@ -82,6 +82,11 @@ public class ARFFcontent {
 		
 		LinkedHashMap<File, Stream<String>> file2stream = new LinkedHashMap<>();
 		LinkedHashMap<File, Iterator<String>> file2input = new LinkedHashMap<>();
+		
+		for (File f : columnData) {
+			file2stream.put(f, null);
+			file2input.put(f, null);
+		}
 		
 		for (int line = 0; line < maxLines; line++) {
 			StringBuilder sb = new StringBuilder();
