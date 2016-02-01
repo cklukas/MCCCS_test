@@ -746,7 +746,7 @@ public class ARFFProcessor {
 	 * @return
 	 * @throws IOException
 	 */
-	public String convertImagesToArffNG(ImagePlus ip, String path, String name, Image mask_img, boolean b) throws IOException {
+	public String convertImagesToArffNG(ImagePlus ip, String out_path_name, String channel_name, String folder_name, Image mask_img, boolean b) throws IOException {
 		boolean checkMask = mask_img == null ? false : true;
 		
 		int[] mask = null;
@@ -759,7 +759,7 @@ public class ARFFProcessor {
 		String attributes = "";
 		
 		for (int i = 0; i < 1; i++) {
-			attributes += "@attribute " + makeNice(ip.getTitle())
+			attributes += "@attribute " + channel_name
 					+ "\tNUMERIC\n";
 		}
 		
@@ -774,7 +774,7 @@ public class ARFFProcessor {
 		}
 		attributes += "}\n";
 		
-		String header = "%\n" + "@relation '" + name + "'\n" + attributes
+		String header = "%\n" + "@relation '" + folder_name + "'\n" + attributes
 				+ "@data\n";
 		
 		float[][] XY = ip.getProcessor().getFloatArray();
@@ -784,7 +784,7 @@ public class ARFFProcessor {
 		
 		String line = "";
 		
-		String fn = path + "/" + name + ".arff";
+		String fn = out_path_name + ".arff";
 		
 		FileWriter fw = new FileWriter(new File(fn), false);
 		

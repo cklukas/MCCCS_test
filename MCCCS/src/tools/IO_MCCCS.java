@@ -176,7 +176,7 @@ public class IO_MCCCS {
 	public enum ReadMode {
 		IMAGES, MASKS, GROUNDTRUTH, GROUNDTRUTH_USER;
 		
-		String getMode() {
+		public String getMode() {
 			switch (this) {
 				case GROUNDTRUTH_USER:
 					return "dt_";

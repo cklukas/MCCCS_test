@@ -33,11 +33,6 @@ public class ArffFromImageFileGenerator {
 		} else {
 			int parmIndex = 0;
 			for (String a : args) {
-				// if (parmCount == 0) {
-				// // Settings.numberOfChannels = Integer.parseInt(a);
-				// parmCount++;
-				// continue;
-				// }
 				
 				if (parmIndex == 0) {
 					Settings.numberOfClasses = Math.abs(Integer.parseInt(a));
@@ -73,7 +68,7 @@ public class ArffFromImageFileGenerator {
 					String path = f.getPath();
 					
 					if (NG) {
-						String filename = ReadMode.IMAGES.name();
+						String filename = ReadMode.IMAGES.getMode();
 						String extension = ".tif";
 						String[] flist = f.list();
 						
@@ -101,18 +96,20 @@ public class ArffFromImageFileGenerator {
 							final int idxxx = idx;
 							String idxxxs = idxxx + "";
 							try {
-								ImagePlus ip = null;
-								String fname = hmap.get(filename + idxxxs);
-								String pathOrURL = f.getAbsolutePath() + File.separator + fname;
+								String channel_name = filename + idxxxs;
+								String image_name = hmap.get(channel_name);
+								ImagePlus ip = new ImagePlus(f.getAbsolutePath() + File.separator + image_name);;
 								
-								String fn = ac.convertImagesToArffNG(ip, path, name + "_" + Settings.numberOfClasses, mask, false);
-								arffFiles.add(fn);
+								String pathOrURLToARFF = f.getAbsolutePath() + File.separator + channel_name;
+								
+								ac.convertImagesToArffNG(ip, pathOrURLToARFF, channel_name, name, mask, false);
+								arffFiles.add(pathOrURLToARFF + ".arff");
 							} catch (Exception e) {
 								throw new RuntimeException(e);
 							}
 						}
 						
-						arffFiles.add(0, f.getAbsolutePath() + File.separator + "_UNKNOWN_FILENAME.arff");
+						arffFiles.add(0, f.getAbsolutePath() + File.separator + name + "_" + Settings.numberOfClasses + ".arff");
 						MergeArffFiles.main(arffFiles.toArray(new String[] {}));
 					} else {
 						
