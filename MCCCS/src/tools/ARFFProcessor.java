@@ -759,20 +759,21 @@ public class ARFFProcessor {
 		String attributes = "";
 		
 		for (int i = 0; i < 1; i++) {
-			attributes += "@attribute " + channel_name
+			attributes += "@attribute " + makeNice(channel_name)
 					+ "\tNUMERIC\n";
 		}
 		
-		int numberOfDiseaseClasses = Settings.numberOfClasses;
-		
-		attributes += "@attribute class\t{";
-		for (int idx = 0; idx < numberOfDiseaseClasses; idx++) {
-			if (idx < numberOfDiseaseClasses - 1)
-				attributes += ("class" + idx + ",");
-			else
-				attributes += ("class" + idx);
-		}
-		attributes += "}\n";
+//		int numberOfDiseaseClasses = Settings.numberOfClasses;
+
+// class attribute will be added in Merge phase		
+//		attributes += "@attribute class\t{";
+//		for (int idx = 0; idx < numberOfDiseaseClasses; idx++) {
+//			if (idx < numberOfDiseaseClasses - 1)
+//				attributes += ("class" + idx + ",");
+//			else
+//				attributes += ("class" + idx);
+//		}
+//		attributes += "}\n";
 		
 		String header = "%\n" + "@relation '" + folder_name + "'\n" + attributes
 				+ "@data\n";
@@ -796,11 +797,13 @@ public class ARFFProcessor {
 					if (mask[x + y * width] == background)
 						continue;
 				
-				line += XY[x][y] + ",";
+//				line += XY[x][y] + ",";
+				line += XY[x][y];
 				
 				if (line.length() > 0) {
 					// appends the string to the file
-					fw.write(line + "?" + "\n");
+//					fw.write(line + "?" + "\n");
+					fw.write(line + "\n");
 					// .add(line + "; x: " + x + ", y: " + y);
 					line = "";
 				}
