@@ -4,7 +4,10 @@ import ij.ImagePlus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.graffiti.plugin.io.resources.FileSystemHandler;
@@ -92,11 +95,11 @@ public class ArffFromImageFileGenerator {
 						ArrayList<String> arffFiles = new ArrayList<>();
 						
 						// read images and create arff file
-						for (int idx = 0; idx < hmap.size(); idx++) {
-							final int idxxx = idx;
-							String idxxxs = idxxx + "";
+						Iterator<Entry<String, String>> it = hmap.entrySet().iterator();
+					   while (it.hasNext()) {
+					      Map.Entry pair = it.next();
+							String channel_name = (String) pair.getKey();
 							try {
-								String channel_name = filename + idxxxs;
 								String image_name = hmap.get(channel_name);
 								ImagePlus ip = new ImagePlus(f.getAbsolutePath() + File.separator + image_name);;
 								
@@ -110,6 +113,7 @@ public class ArffFromImageFileGenerator {
 						}
 						
 						arffFiles.add(0, f.getAbsolutePath() + File.separator + name + "_" + Settings.numberOfClasses + ".arff");
+						arffFiles.add("+?");
 						MergeArffFiles.main(arffFiles.toArray(new String[] {}));
 					} else {
 						

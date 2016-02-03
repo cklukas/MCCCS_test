@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
+import workflow.Settings;
 
 /**
  * @author klukas
@@ -55,7 +56,7 @@ public class ARFFcontent {
 		columnDataLineCount.add(dataLines.size());
 	}
 	
-	public void writeTo(File file, HashSet<Integer> removeColumns) throws IOException {
+	public void writeTo(File file, HashSet<Integer> removeColumns, String addLast) throws IOException {
 		FileWriter tf = new FileWriter(file);
 		
 		tf.write("%" + System.lineSeparator());
@@ -71,6 +72,19 @@ public class ARFFcontent {
 				} else
 					tf.write(hl + System.lineSeparator());
 			}
+		}
+		
+		// add class info in case of addLst == ?
+		if (addLast.contains("?"))
+		{
+			tf.write("@attribute class\t{");
+			for (int idx = 0; idx < Settings.numberOfClasses; idx++) {
+				if (idx < Settings.numberOfClasses - 1)
+					tf.write("class" + idx + ",");
+				else
+					tf.write("class" + idx);
+			}
+			tf.write("}" + System.lineSeparator());
 		}
 		
 		int maxLines = 0;
@@ -123,7 +137,14 @@ public class ARFFcontent {
 				}
 				val = sb.toString();
 			}
-			tf.write(val + System.lineSeparator());
+			
+			tf.write(val);
+			
+			// append last
+			if(addLast.length() > 0)
+				tf.write("," + addLast);
+			
+			tf.write(System.lineSeparator());
 		}
 		
 		for (File f : file2stream.keySet())
