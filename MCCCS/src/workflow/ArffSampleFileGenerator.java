@@ -4,12 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import support.ImageStackAsARFF;
 import tools.ClassifierDisease_Process_16Bit;
 import tools.ClassifierFGBG_Process_16Bit;
 import tools.IO_MCCCS;
 import de.ipk.ag_ba.gui.picture_gui.BackgroundThreadDispatcher;
 import de.ipk.ag_ba.gui.picture_gui.LocalComputeJob;
-import de.ipk.ag_ba.image.structures.ImageStack;
 
 /**
  * Sample Extraction from input images, generates .arff file for classifier training.
@@ -74,10 +74,10 @@ public class ArffSampleFileGenerator {
 							try {
 								IO_MCCCS io = new IO_MCCCS(f);
 								
-								ImageStack[] isl = io.readTrainingData(false, f_isFGBG);
+								ImageStackAsARFF[] isl = io.readTrainingDataAsARFF(false, f_isFGBG);
 								
 								if (Settings.debug_IO) {
-									for (ImageStack st : isl)
+									for (ImageStackAsARFF st : isl)
 										st.show("debug_IO");
 								}
 								
@@ -87,7 +87,7 @@ public class ArffSampleFileGenerator {
 									wait_inner.add(BackgroundThreadDispatcher.addTask(() -> {
 										ClassifierFGBG_Process_16Bit fgbgClassifier = new ClassifierFGBG_Process_16Bit("fgbgTraining");
 										try {
-											fgbgClassifier.createSampleData(isl, f, Settings.sampleSize);
+											fgbgClassifier.createSampleDataFromArff(isl, f, Settings.sampleSize);
 										} catch (Exception e) {
 											e.printStackTrace();
 											throw new RuntimeException(e);
@@ -98,7 +98,7 @@ public class ArffSampleFileGenerator {
 									wait_inner.add(BackgroundThreadDispatcher.addTask(() -> {
 										ClassifierDisease_Process_16Bit diseaseClassifier = new ClassifierDisease_Process_16Bit("labelTraining");
 										try {
-											diseaseClassifier.createSampleData(isl, f, Settings.sampleSize);
+											diseaseClassifier.createSampleDataFromArff(isl, f, Settings.sampleSize);
 										} catch (Exception e) {
 											e.printStackTrace();
 											throw new RuntimeException(e);

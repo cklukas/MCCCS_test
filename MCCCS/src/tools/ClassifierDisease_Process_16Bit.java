@@ -5,6 +5,7 @@ import ij.process.ImageProcessor;
 import java.io.File;
 import java.io.IOException;
 
+import support.ImageStackAsARFF;
 import workflow.Settings;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
@@ -14,6 +15,11 @@ public class ClassifierDisease_Process_16Bit extends AbstractClassifier_16Bit {
 	
 	public ClassifierDisease_Process_16Bit(String arffFileName) {
 		this.arffFileName = arffFileName;
+	}
+	
+	@Override
+	public void createSampleDataFromArff(ImageStackAsARFF[] isl, File f, int numberofsamples) throws InterruptedException, IOException {
+		throw new RuntimeException("TODO");
 	}
 	
 	@Override

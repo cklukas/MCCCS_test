@@ -3,6 +3,7 @@ package tools;
 import java.io.File;
 import java.io.IOException;
 
+import support.ImageStackAsARFF;
 import workflow.Settings;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
@@ -15,6 +16,25 @@ public class ClassifierFGBG_Process_16Bit extends AbstractClassifier_16Bit {
 	
 	public ClassifierFGBG_Process_16Bit(String arffFileName) {
 		this.arffFileName = arffFileName;
+	}
+	
+	@Override
+	public void createSampleDataFromArff(ImageStackAsARFF[] isl, File f, int numberofsamples) throws InterruptedException, IOException {
+		ImageStackAsARFF is = isl[0];
+		ImageStackAsARFF masks = isl[1];
+		
+		// apply masks ...
+		ImageStackAsARFF applyedM = applyMasks(is, masks, false);
+		
+		// get fg & bg
+		ImageStackAsARFF[] fgbg = getFGBG(applyedM);
+		
+		if (false) {
+			is.show("input images");
+			masks.show("mask images");
+			applyedM.show("masked");
+		}
+		ARFFProcessor.createTrainingDataSet(fgbg, Settings.back, f, numberofsamples, arffFileName, false, "fgbg"); // Float.MAX_VALUE
 	}
 	
 	@Override
@@ -35,6 +55,19 @@ public class ClassifierFGBG_Process_16Bit extends AbstractClassifier_16Bit {
 		}
 		// ARFFProcessor.createTrainingDataSet(gtApplied, 0.0f, f, numberofsamples, arffFileName, false, "label", false); // back => Float.MAX_VALUE
 		ARFFProcessor.createTrainingDataSet(fgbg, Settings.back, f, numberofsamples, arffFileName, false, "fgbg"); // Float.MAX_VALUE
+	}
+	
+	private ImageStackAsARFF[] getFGBG(ImageStackAsARFF applyedM) {
+		ImageStackAsARFF fgStack = new ImageStackAsARFF();
+		ImageStackAsARFF bgStack = new ImageStackAsARFF();
+		
+		String[] labels = applyedM.getLabels();
+		
+		for (int i = 0; i < applyedM.size(); i += 2) {
+			fgStack.addImage(labels[i], applyedM.getProcessor(i));
+			bgStack.addImage(labels[i + 1], applyedM.getProcessor(i + 1));
+		}
+		return new ImageStackAsARFF[] { fgStack, bgStack };
 	}
 	
 	private ImageStack[] getFGBG(ImageStack applyedM) {
