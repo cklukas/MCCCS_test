@@ -33,9 +33,9 @@ public class HyspecLoader {
 	
 	private ImageStack getCubeAsImageStack(float[][][] cubeF, float[][][] cubeB, ImageStackViewMode viewMode, double overflow) {
 		if (cubeB != null)
-			cubeB = overflowThresholding(cubeB, overflow);
+			cubeB = overflowThresholdingOrScalingOfOutput(cubeB, overflow);
 		if (cubeF != null)
-			cubeF = overflowThresholding(cubeF, overflow);
+			cubeF = overflowThresholdingOrScalingOfOutput(cubeF, overflow);
 		
 		boolean mode4;
 		switch (viewMode) {
@@ -133,15 +133,28 @@ public class HyspecLoader {
 		return is;
 	}
 	
-	private float[][][] overflowThresholding(float[][][] cube, double overflow) {
+	/**
+	 * @param positive_overflow_or_negative_divider
+	 *           if values are larger than the overflow value (if overflow value is greater than 0),
+	 *           values are cut off to that threshold. If the overflow value is negative, no overflow is applied.
+	 *           Instead if that value is different from -1, the output value is divided by the absolute of that
+	 *           overflow value.
+	 */
+	private float[][][] overflowThresholdingOrScalingOfOutput(float[][][] cube, double positive_overflow_or_negative_divider) {
 		float[][][] res = new float[cube.length][cube[0].length][cube[0][0].length];
+		float divider = (float) positive_overflow_or_negative_divider;
 		for (int idxL = 0; idxL < cube.length; idxL++) {
 			for (int idxA = 0; idxA < cube[0].length; idxA++) {
 				for (int idxB = 0; idxB < cube[0][0].length; idxB++) {
-					if (cube[idxL][idxA][idxB] >= overflow && overflow > 0)
+					if (cube[idxL][idxA][idxB] >= positive_overflow_or_negative_divider && positive_overflow_or_negative_divider > 0)
 						res[idxL][idxA][idxB] = 0.0f;
-					else
-						res[idxL][idxA][idxB] = cube[idxL][idxA][idxB];
+					else {
+						if (positive_overflow_or_negative_divider < 0 && Math.abs(positive_overflow_or_negative_divider + 1) > 0.0001) {
+							res[idxL][idxA][idxB] = cube[idxL][idxA][idxB] / -divider;
+						} else {
+							res[idxL][idxA][idxB] = cube[idxL][idxA][idxB];
+						}
+					}
 				}
 			}
 		}
@@ -198,7 +211,7 @@ public class HyspecLoader {
 		BSQ, BIL, BIP;
 		
 		public String getName() {
-			switch(this) {
+			switch (this) {
 				case BSQ:
 					return "bsq";
 				case BIL:
