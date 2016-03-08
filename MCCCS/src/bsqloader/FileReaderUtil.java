@@ -30,4 +30,6 @@ public interface FileReaderUtil {
 	double readDouble(int position) throws IOException;
 	
 	void position(int position) throws IOException;
+	
+	int readUShort() throws IOException;
 }

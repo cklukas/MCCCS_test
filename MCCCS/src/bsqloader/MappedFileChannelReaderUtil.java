@@ -87,6 +87,17 @@ public class MappedFileChannelReaderUtil implements FileReaderUtil {
 	}
 	
 	@Override
+	public int readUShort() throws IOException {
+		byte b2 = fileBuffer.get();
+		byte b1 = fileBuffer.get();
+		int i = 0;
+		i |= b1 & 0xFF;
+		i <<= 8;
+		i |= b2 & 0xFF;
+		return i;
+	}
+	
+	@Override
 	public short readShort(int position) throws IOException {
 		fileBuffer.position(position);
 		return readShort();

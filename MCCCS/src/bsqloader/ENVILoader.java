@@ -53,9 +53,7 @@ public abstract class ENVILoader {
 				sample = fileReader.readByte();
 				break;
 			case 12:
-				sample = fileReader.readShort();
-				if (sample < 0)
-					sample = -sample + 32767;
+				sample = fileReader.readUShort();
 				break;
 			case 20:
 				sample = fileReader.readShort();
