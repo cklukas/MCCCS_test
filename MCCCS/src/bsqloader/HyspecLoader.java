@@ -12,20 +12,22 @@ import de.ipk.ag_ba.image.structures.ImageStack;
  */
 public class HyspecLoader {
 	
-	private final BTFFileLoader loader;
+	private final HyperSpecFileLoader loader;
+	private final HyperSpecDataMode mode;
 	
-	public HyspecLoader(String path_hdr, String path_bsq) throws Exception {
-		loader = new BTFFileLoader(path_hdr, path_bsq);
+	public HyspecLoader(String path_hdr, String path_data) throws Exception {
+		loader = new HyperSpecFileLoader(path_hdr, path_data);
+		mode = loader.getDataMode();
 	}
 	
-	public float[][][] getCube() {
-		float[][][] data = loader.read();
+	public float[][][] getCube(HyperSpecDataMode hymode) {
+		float[][][] data = loader.read(hymode);
 		System.out.println(data.length);
 		return data;
 	}
 	
 	public ImageStack getCubeAsImageStack(double overflow) {
-		return getCubeAsImageStack(getCube(), null, ImageStackViewMode.UNCHANGED, overflow);
+		return getCubeAsImageStack(getCube(mode), null, ImageStackViewMode.UNCHANGED, overflow);
 	}
 	
 	private ImageStack getCubeAsImageStack(float[][][] cubeF, float[][][] cubeB, ImageStackViewMode viewMode, double overflow) {
@@ -189,5 +191,22 @@ public class HyspecLoader {
 	
 	public enum ImageStackViewMode {
 		DIFFERENCE, FOREGROUND, BACKGROUND, UNCHANGED,
+	}
+	
+	public enum HyperSpecDataMode {
+		BSQ, BIL, BIP;
+		
+		public String getName() {
+			switch(this) {
+				case BSQ:
+					return "bsq";
+				case BIL:
+					return "bil";
+				case BIP:
+					return "bip";
+				default:
+					return "";
+			}
+		}
 	}
 }

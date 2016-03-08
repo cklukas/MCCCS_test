@@ -3,17 +3,21 @@ package bsqloader;
 import java.io.File;
 import java.io.FilenameFilter;
 
-class BTFFileLoader extends ENVILoader {
+import bsqloader.HyspecLoader.HyperSpecDataMode;
+
+class HyperSpecFileLoader extends ENVILoader {
 	
 	private ENVIHeader header;
 	private FileReaderUtil fUtil;
 	
 	/**
-	 * Search whole folder for hdr and bsq files.
+	 * Search whole folder for hdr and bsq,bil,btf files.
 	 * 
 	 * @author Jean-Michel Pape
+	 * @param mode 
+	 * @param  
 	 */
-	public BTFFileLoader(String path) throws Exception {
+	public HyperSpecFileLoader(String path) throws Exception {
 		
 		File file = new File(path);
 		
@@ -50,12 +54,35 @@ class BTFFileLoader extends ENVILoader {
 			}
 	}
 	
-	public BTFFileLoader(String hdr, String bsq) throws Exception {
+	public HyperSpecFileLoader(String hdr, String data) throws Exception {
 		header = ENVIHeader.readHeaderFile(new File(hdr));
-		fUtil = FileUtils.getFileReaderUtil(new File(bsq));
+		fUtil = FileUtils.getFileReaderUtil(new File(data));
 	}
 	
-	public float[][][] read() {
-		return readBSQ(header, fUtil);
+	public float[][][] read(HyperSpecDataMode hymode) {
+		switch(hymode) {
+			case BIL:
+				return readBIL(header, fUtil);
+			case BSQ:
+				return readBSQ(header, fUtil);
+			case BIP:
+				return readBIP(header, fUtil);
+			default:
+				return null;
+		}
+
+	}
+
+	public HyperSpecDataMode getDataMode() {
+		String h = header.getInterleave();
+		try {
+			for (HyperSpecDataMode mode : HyperSpecDataMode.values()) {
+				if(mode.getName().contains(h))
+					return mode;
+			}
+		} catch (Exception e) {
+			System.out.println("Data mode not supported.");
+		}
+		return null;
 	}
 }
