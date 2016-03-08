@@ -4,7 +4,6 @@ import java.io.IOException;
 
 /**
  * Modified by J-M Pape
- * 
  * ***********************************************************************
  * VTE - Visual Terrain Explorer
  * Copyright (C) 2005 Ricardo Veguilla-Gonzalez,
@@ -55,7 +54,7 @@ public abstract class ENVILoader {
 				break;
 			case 12:
 				sample = fileReader.readShort();
-				if(sample < 0)
+				if (sample < 0)
 					sample = -sample + 32767;
 				break;
 			case 20:
@@ -86,115 +85,109 @@ public abstract class ENVILoader {
 		float sample = 0;
 		float[][][] data = new float[bands][samples][lines];
 		
-			for (int b = 0; b < bands; b++) {
-				fileReader.position(offset + bytesPerSample * samples * lines * b);
-				
-				for (int l = 0; l < lines; l++) {
-					for (int s = 0; s < samples; s++) {
-						sample = readData(dataType, fileReader);
-						data[b][s][l] = sample;
-					}
+		for (int b = 0; b < bands; b++) {
+			fileReader.position(offset + bytesPerSample * samples * lines * b);
+			
+			for (int l = 0; l < lines; l++) {
+				for (int s = 0; s < samples; s++) {
+					sample = readData(dataType, fileReader);
+					data[b][s][l] = sample;
 				}
 			}
-			
+		}
+		
 		return data;
 	}
 	
-	 protected float[][][] readBIP(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
-	 /*
-	 * BIP (Band Interleaved by Pixel Format) Images stored in BIP format
-	 * have the first pixel for all bands in sequential order, followed by
-	 * the second pixel for all bands, followed by the third pixel for all
-	 * bands, etc., interleaved up to the number of pixels. This format
-	 * provides optimum performance for spectral (Z) access of the image
-	 * data.
-	 */
-	
-	 int bands = header.getBands();
-	 int lines = header.getLines();
-	 int samples = header.getSamples();
-	 int dataType = header.getDataType();
-	 
-	 float[][][] data = new float[bands][samples][lines];
+	protected float[][][] readBIP(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
+		/*
+		 * BIP (Band Interleaved by Pixel Format) Images stored in BIP format
+		 * have the first pixel for all bands in sequential order, followed by
+		 * the second pixel for all bands, followed by the third pixel for all
+		 * bands, etc., interleaved up to the number of pixels. This format
+		 * provides optimum performance for spectral (Z) access of the image
+		 * data.
+		 */
 		
-	 // float sample = 0;
-		 for (int l = 0; l < lines; l++) {
-			 for (int s = 0; s < samples; s++) {
-				 for (int b = 0; b < bands; b++) {
-				
-				 switch (dataType) {
-					 case -10:
-					 case 1:
-					 case 10:
-						 data[b][s][l] = fileReader.readByte();
-						 break;
-					 case 2:
-					 case 20:
-						 data[b][s][l] = (float) fileReader.readShort();
-						 break;
-					 case 4:
-						 data[b][s][l] = (float) fileReader.readFloat();
-						 break;
-					 case 8:
-						 data[b][s][l] =  (float) fileReader.readDouble();
-						 break;
-					 case 40:
-						 data[b][s][l] =  (float) fileReader.readInt();
-						 break;
-				 }
-				
-				 // sample = readData(dataType, fileReader);
-				 // data.putSample(s, l, b, (sample > 0.0 ? sample : 0.0f ));
-				
-				 }
-			 }
-		 }
+		int bands = header.getBands();
+		int lines = header.getLines();
+		int samples = header.getSamples();
+		int dataType = header.getDataType();
 		
-	 	return data;
-	 }
+		float[][][] data = new float[bands][samples][lines];
+		
+		// float sample = 0;
+		for (int l = 0; l < lines; l++) {
+			for (int s = 0; s < samples; s++) {
+				for (int b = 0; b < bands; b++) {
+					
+					switch (dataType) {
+						case -10:
+						case 1:
+						case 10:
+							data[b][s][l] = fileReader.readByte();
+							break;
+						case 2:
+						case 20:
+							data[b][s][l] = fileReader.readShort();
+							break;
+						case 4:
+							data[b][s][l] = fileReader.readFloat();
+							break;
+						case 8:
+							data[b][s][l] = (float) fileReader.readDouble();
+							break;
+						case 40:
+							data[b][s][l] = fileReader.readInt();
+							break;
+					}
+					
+					// sample = readData(dataType, fileReader);
+					// data.putSample(s, l, b, (sample > 0.0 ? sample : 0.0f ));
+					
+				}
+			}
+		}
+		
+		return data;
+	}
 	
-	 protected float[][][] readBIL(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
-	 /*
-	 * BIL (Band Interleaved by Line Format) Images stored in BIL format
-	 * have the first line of the first band followed by the first line of
-	 * the second band, followed by the first line of the third band,
-	 * interleaved up to the number of bands. Subsequent lines for each band
-	 * are interleaved in similar fashion. This format provides a compromise
-	 * in performance between spatial and spectral processing and is the
-	 * recommended file format for most ENVI processing tasks.
-	 * arguments:
-	 * samples: total number of samples per line (columns) lines: total
-	 * number of lines per image (rows) bands: total number of bands
-	 * firstPixel: number of the first pixel to read numPixels: number of
-	 * consecutive pixels to read after the first pixel numBytes: number of
-	 * bytes per sample filename: name of input file
-	 * return value: a float array of (numPixels x bands) size which
-	 * contains all the bands for numPixel number of pixels starting from
-	 * firstPixel.
-	 */
-	
-	 int dataType = header.getDataType();
-	 int bytesPerSample = getBytesPerSample(dataType);
-	 int samples = header.getSamples();
-	 int bands = header.getBands();
-	 int lines = header.getLines();
-	 float sample = 0;
-	 int pixel = 0;
-	 
-	 float[][][] data = new float[bands][samples][lines];
-	
-		 for (int l = 0; l < lines; l++) {
-			 for (int s = 0; s < samples; s++) {
-				 pixel = (l * samples) + s;
-				 fileReader.position(pixel * bytesPerSample * bands);
-					 for (int b = 0; b < bands; b++) {
-						 sample = readData(dataType, fileReader);
-						 data[b][s][l] = (sample > 0.0 ? sample : 0.0f);
-					 }
-				 }
-			 }
-	 return data;
-	 }
+	protected float[][][] readBIL(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
+		/*
+		 * BIL (Band Interleaved by Line Format) Images stored in BIL format
+		 * have the first line of the first band followed by the first line of
+		 * the second band, followed by the first line of the third band,
+		 * interleaved up to the number of bands. Subsequent lines for each band
+		 * are interleaved in similar fashion. This format provides a compromise
+		 * in performance between spatial and spectral processing and is the
+		 * recommended file format for most ENVI processing tasks.
+		 * arguments:
+		 * samples: total number of samples per line (columns) lines: total
+		 * number of lines per image (rows) bands: total number of bands
+		 * firstPixel: number of the first pixel to read numPixels: number of
+		 * consecutive pixels to read after the first pixel numBytes: number of
+		 * bytes per sample filename: name of input file
+		 * return value: a float array of (numPixels x bands) size which
+		 * contains all the bands for numPixel number of pixels starting from
+		 * firstPixel.
+		 */
+		
+		int dataType = header.getDataType();
+		int samples = header.getSamples();
+		int bands = header.getBands();
+		int lines = header.getLines();
+		
+		float[][][] data = new float[bands][samples][lines];
+		
+		for (int l = 0; l < lines; l++) {
+			for (int b = 0; b < bands; b++) {
+				for (int s = 0; s < samples; s++) {
+					data[b][s][l] = readData(dataType, fileReader);
+				}
+			}
+		}
+		return data;
+	}
 	
 	protected int getBytesPerSample(int dataType) {
 		int bytesPerSample = 0;
