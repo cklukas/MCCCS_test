@@ -20,7 +20,8 @@ public class ExportImagesFromHyperSpec {
 			new Settings(true);
 		}
 		if (args == null || args.length < 3) {
-			System.err.println("No [prefix], [overflow threshold or negative value to disable] and [filenames] provided as parameters! Return Code 1");
+			System.err
+					.println("No [prefix], [overflow threshold, -1 to keep input values, other negative values to divide the output values by the specified number] and [filenames] provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			int idx = 0;
@@ -46,9 +47,9 @@ public class ExportImagesFromHyperSpec {
 				for (File f : fl) {
 					for (File ff : f.listFiles()) {
 						for (HyperSpecDataMode dataMode : HyperSpecDataMode.values())
-						if (ff.getName().endsWith("." + dataMode.getName())) {
-							data = ff;
-						}
+							if (ff.getName().endsWith("." + dataMode.getName())) {
+								data = ff;
+							}
 						
 						if (ff.getName().endsWith(".hdr"))
 							hdr = ff;
