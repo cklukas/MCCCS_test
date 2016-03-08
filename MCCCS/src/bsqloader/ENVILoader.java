@@ -54,7 +54,9 @@ public abstract class ENVILoader {
 				sample = fileReader.readByte();
 				break;
 			case 12:
-				sample = fileReader.readInt();
+				sample = fileReader.readShort();
+				if(sample < 0)
+					sample = -sample + 32767;
 				break;
 			case 20:
 				sample = fileReader.readShort();
@@ -66,7 +68,7 @@ public abstract class ENVILoader {
 		return sample;
 	}
 	
-	protected float[][][] readBSQ(ENVIHeader header, FileReaderUtil fileReader) {
+	protected float[][][] readBSQ(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
 		/*
 		 * BSQ (Band Sequential Format) In its simplest form, the data is in BSQ
 		 * format, with each line of the data followed immediately by the next
@@ -84,8 +86,6 @@ public abstract class ENVILoader {
 		float sample = 0;
 		float[][][] data = new float[bands][samples][lines];
 		
-		try {
-			
 			for (int b = 0; b < bands; b++) {
 				fileReader.position(offset + bytesPerSample * samples * lines * b);
 				
@@ -97,14 +97,10 @@ public abstract class ENVILoader {
 				}
 			}
 			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return data;
 	}
 	
-	 protected float[][][] readBIP(ENVIHeader header, FileReaderUtil fileReader) {
+	 protected float[][][] readBIP(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
 	 /*
 	 * BIP (Band Interleaved by Pixel Format) Images stored in BIP format
 	 * have the first pixel for all bands in sequential order, followed by
@@ -122,7 +118,6 @@ public abstract class ENVILoader {
 	 float[][][] data = new float[bands][samples][lines];
 		
 	 // float sample = 0;
-	 try {
 		 for (int l = 0; l < lines; l++) {
 			 for (int s = 0; s < samples; s++) {
 				 for (int b = 0; b < bands; b++) {
@@ -155,14 +150,10 @@ public abstract class ENVILoader {
 			 }
 		 }
 		
-		 } catch (IOException e) {
-			 // TODO Auto-generated catch block
-			 e.printStackTrace();
-		 }
 	 	return data;
 	 }
 	
-	 protected float[][][] readBIL(ENVIHeader header, FileReaderUtil fileReader) {
+	 protected float[][][] readBIL(ENVIHeader header, FileReaderUtil fileReader) throws IOException {
 	 /*
 	 * BIL (Band Interleaved by Line Format) Images stored in BIL format
 	 * have the first line of the first band followed by the first line of
@@ -192,7 +183,6 @@ public abstract class ENVILoader {
 	 
 	 float[][][] data = new float[bands][samples][lines];
 	
-	 try {
 		 for (int l = 0; l < lines; l++) {
 			 for (int s = 0; s < samples; s++) {
 				 pixel = (l * samples) + s;
@@ -203,10 +193,6 @@ public abstract class ENVILoader {
 					 }
 				 }
 			 }
-		 } catch (IOException e) {
-		 // TODO Auto-generated catch block
-		 e.printStackTrace();
-		 }
 	 return data;
 	 }
 	
@@ -220,6 +206,7 @@ public abstract class ENVILoader {
 				bytesPerSample = 1;
 				break;
 			case 2:
+			case 12:
 			case 20:
 				bytesPerSample = 2;
 				break;

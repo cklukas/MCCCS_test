@@ -1,6 +1,7 @@
 package bsqloader;
 
 import java.awt.Color;
+import java.io.IOException;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -20,13 +21,13 @@ public class HyspecLoader {
 		mode = loader.getDataMode();
 	}
 	
-	public float[][][] getCube(HyperSpecDataMode hymode) {
+	public float[][][] getCube(HyperSpecDataMode hymode) throws IOException {
 		float[][][] data = loader.read(hymode);
 		System.out.println(data.length);
 		return data;
 	}
 	
-	public ImageStack getCubeAsImageStack(double overflow) {
+	public ImageStack getCubeAsImageStack(double overflow) throws IOException {
 		return getCubeAsImageStack(getCube(mode), null, ImageStackViewMode.UNCHANGED, overflow);
 	}
 	

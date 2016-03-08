@@ -2,6 +2,7 @@ package bsqloader;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 
 import bsqloader.HyspecLoader.HyperSpecDataMode;
 
@@ -59,7 +60,7 @@ class HyperSpecFileLoader extends ENVILoader {
 		fUtil = FileUtils.getFileReaderUtil(new File(data));
 	}
 	
-	public float[][][] read(HyperSpecDataMode hymode) {
+	public float[][][] read(HyperSpecDataMode hymode) throws IOException {
 		switch(hymode) {
 			case BIL:
 				return readBIL(header, fUtil);
