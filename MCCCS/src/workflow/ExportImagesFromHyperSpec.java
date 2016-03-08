@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 
 import bsqloader.HyspecLoader;
+import bsqloader.HyspecLoader.HyperSpecDataMode;
 import de.ipk.ag_ba.image.structures.ImageStack;
 
 public class ExportImagesFromHyperSpec {
@@ -38,20 +39,24 @@ public class ExportImagesFromHyperSpec {
 				
 				fl.add(new File(a));
 				
-				File bsq = null;
+				File data = null;
 				File hdr = null;
+				HyperSpecDataMode mode = null;
 				
 				for (File f : fl) {
 					for (File ff : f.listFiles()) {
-						if (ff.getName().endsWith(".bsq"))
-							bsq = ff;
+						for (HyperSpecDataMode dataMode : HyperSpecDataMode.values())
+						if (ff.getName().endsWith("." + dataMode.getName())) {
+							data = ff;
+						}
+						
 						if (ff.getName().endsWith(".hdr"))
 							hdr = ff;
 					}
 				}
 				
-				if (bsq != null && hdr != null) {
-					HyspecLoader loader = new HyspecLoader(hdr.getPath(), bsq.getPath());
+				if (data != null && hdr != null) {
+					HyspecLoader loader = new HyspecLoader(hdr.getPath(), data.getPath());
 					ImageStack is = loader.getCubeAsImageStack(overflow);
 					is.saveAsSeparateImages(new File(hdr.getParent() + "/"), args[0]);
 					is.saveAsLayeredTif(new File(hdr.getPath().split("\\.")[0] + "_stack.tif"));
