@@ -12,9 +12,9 @@ import de.ipk_gatersleben.ag_nw.graffiti.plugins.gui.webstart.TextFile;
 /**
  * Reads the CSV result file and transforms some rows to columns and
  * renames infection color ids to human-readable traits.
- * Cleans-up some content of the column entries.
+ * Cleans-up some content of the column entries, fills empty with 0.0.
  * 
- * @author Christian Klukas
+ * @author Christian Klukas, Jean-Michel Pape
  */
 public class TransformCSV {
 	
@@ -56,7 +56,7 @@ public class TransformCSV {
 						for (String col : globalColumnSet) {
 							Double v = kv.get(col);
 							if (v == null)
-								rowContent.append("\t" + "");
+								rowContent.append("\t" + "0.0");
 							else
 								rowContent.append("\t" + v);
 						}

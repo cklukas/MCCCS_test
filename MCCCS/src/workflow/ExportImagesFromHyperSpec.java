@@ -10,7 +10,7 @@ import de.ipk.ag_ba.image.structures.ImageStack;
 public class ExportImagesFromHyperSpec {
 	
 	/**
-	 * Creates separate images from hyper-spectral image dataset (BSQ format).
+	 * Creates separate images from hyper-spectral image data set (BSQ, BIL format).
 	 * input: prefix for output filename, overflow threshold or negative value to disable, filenames (input)
 	 * 
 	 * @author Jean-Michel Pape

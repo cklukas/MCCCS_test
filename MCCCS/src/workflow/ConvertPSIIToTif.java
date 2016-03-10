@@ -19,7 +19,7 @@ import ij.process.ImageProcessor;
  *  input: folder including files for conversion
  *  output: same folder as used for input
  * 
- * @author pape
+ * @author Jean-Michel Pape
  *
  */
 public class ConvertPSIIToTif {
