@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 import org.Vector2i;
@@ -80,6 +81,9 @@ public class MergeTouchingRegions {
 			HashMap<Integer, ArrayList<Vector2i>> color2region = new HashMap<Integer, ArrayList<Vector2i>>();
 			findRegions(w, h, ia, color2region);
 			int nnn = 0;
+			
+			HashSet<Integer> mergedColors = new HashSet<Integer>();
+			
 			while (color2region.size() > Math.ceil(targetCount)) {
 				
 				if (alternative_strategy_0to6 == 6) {
@@ -160,9 +164,14 @@ public class MergeTouchingRegions {
 				// compactness by merging
 				double bestImprovement = -Double.MAX_VALUE;
 				Vector2i bestPair = null;
+				
 				for (Vector2i touchingPair : touchingColorPairs) {
 					int color1 = touchingPair.x;
 					int color2 = touchingPair.y;
+					
+					if (alternative_strategy_0to6 == 9 || alternative_strategy_0to6 == 10 || alternative_strategy_0to6 == 13 || alternative_strategy_0to6 == 14)
+						if (mergedColors.contains(color1) || mergedColors.contains(color2))
+							continue;
 					
 					double c1 = color2compactness.get(color1);
 					double c2 = color2compactness.get(color2);
@@ -202,6 +211,42 @@ public class MergeTouchingRegions {
 							a2 = color2region.get(color2).size();
 							improvement = -Math.min(c1, c2);
 							break;
+						case 6:
+							a1 = color2region.get(color1).size();
+							a2 = color2region.get(color2).size();
+							improvement = a1 + a2;
+							break;
+						case 7:
+							a1 = color2region.get(color1).size();
+							a2 = color2region.get(color2).size();
+							improvement = Math.min(a1, a2);
+							break;
+						case 8:
+							a1 = color2region.get(color1).size();
+							a2 = color2region.get(color2).size();
+							improvement = Math.max(a1, a2);
+							break;
+						case 9:
+							a1 = color2region.get(color1).size();
+							a2 = color2region.get(color2).size();
+							improvement = Math.max(a1, a2);
+							break;
+						case 10:
+							a1 = color2region.get(color1).size();
+							a2 = color2region.get(color2).size();
+							improvement = a1 + a2;
+							break;
+						case 11:
+						case 13:
+							Vector2i bb1 = getBoundingBox(color2region.get(color1));
+							Vector2i bb2 = getBoundingBox(color2region.get(color2));
+							Vector2i mergedBB = getBoundingBox(color2region.get(color1), color2region.get(color2));
+							improvement = -(mergedBB.x - bb1.x - bb2.x + mergedBB.y - bb1.y - bb2.y);
+							break;
+						case 12:
+						case 14:
+							improvement = getBoundingBoxOverlap(color2regionOutline.get(color1), color2regionOutline.get(color2));
+							break;
 						default:
 							throw new UnsupportedOperationException("Not supported strategy");
 							
@@ -218,7 +263,8 @@ public class MergeTouchingRegions {
 				
 				// recolor region 1 and region 2 of merge regions
 				if (bestPair == null) {
-					System.out.println("Found no touching regions. Can't continue processing.");
+					System.out.println("Warning: Found no touching regions. Can't continue processing. save file anyway (with too many regions)");
+					new Image(ia).saveToFile(args[1]);
 					System.exit(0);
 				}
 				
@@ -231,6 +277,7 @@ public class MergeTouchingRegions {
 							+ "Need to abort processing. Error Code 1.");
 					System.exit(1);
 				}
+				mergedColors.add(mergedRegionColor);
 				for (int x = 0; x < w; x++) {
 					for (int y = 0; y < h; y++) {
 						int c = ia[x][y];
@@ -244,6 +291,48 @@ public class MergeTouchingRegions {
 			
 			new Image(ia).saveToFile(args[1]);
 		}
+	}
+	
+	private static double getBoundingBoxOverlap(ArrayList<Vector2i> arrayList, ArrayList<Vector2i> arrayList2) {
+		int near = 0;
+		for (Vector2i p1 : arrayList)
+			for (Vector2i p2 : arrayList2)
+				if (p1.distance(p2) < 2)
+					near++;
+		return near;
+	}
+	
+	private static Vector2i getBoundingBox(ArrayList<Vector2i> arrayList) {
+		return getBoundingBox(arrayList, null);
+	}
+	
+	@SuppressWarnings("unchecked")
+	private static Vector2i getBoundingBox(ArrayList<Vector2i> arrayList, ArrayList<Vector2i> arrayList2) {
+		Vector2i r = new Vector2i();
+		int minx = Integer.MAX_VALUE;
+		int maxx = -1;
+		int miny = Integer.MAX_VALUE;
+		int maxy = -1;
+		for (ArrayList<Vector2i> al : new ArrayList[] { arrayList, arrayList2 })
+			if (al != null)
+				for (Vector2i p : al) {
+					if (p.x < minx) {
+						minx = p.x;
+					}
+					if (p.x > maxx) {
+						maxx = p.x;
+					}
+					if (p.y < miny) {
+						miny = p.y;
+					}
+					if (p.y > maxy) {
+						maxy = p.y;
+					}
+				}
+		r.x = maxx - minx;
+		r.y = maxy - miny;
+		
+		return r;
 	}
 	
 	private static void findRegions(int w, int h, int[][] ia, HashMap<Integer, ArrayList<Vector2i>> color2region) {
@@ -280,7 +369,7 @@ public class MergeTouchingRegions {
 			}
 		}
 		return false;
-	}
+	} // WO IST DIE ERROR LISTE (VIEW)?
 	
 	private static int neighbourCountDifferentToColor(int color, Vector2i pix, int[][] img, int w, int h) {
 		int found = 0;
@@ -300,8 +389,11 @@ public class MergeTouchingRegions {
 		int found = 0;
 		for (int x = pix.x - 1; x <= pix.x + 1; x++) {
 			for (int y = pix.y - 1; y <= pix.y + 1; y++) {
-				if (img[x][y] == color)
-					found++;
+				if (x < 0 || y < 0 || x >= w || y >= h)
+					;
+				else
+					if (img[x][y] == color)
+						found++;
 			}
 		}
 		return found;
