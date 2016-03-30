@@ -30,7 +30,7 @@ public class Quantify_Enhanced {
 			new Settings(true);
 		}
 		if (args == null || args.length < 2) {
-			System.err.println("No output mode [0 - percentage, 1 - absolute pixel numbers]  filename provided as parameters! Return Code 1");
+			System.err.println("No output mode [0 - percentage, 1 - absolute pixel numbers]  and/or filename provided as parameters! Return Code 1");
 			System.exit(1);
 		} else {
 			int outMode = Integer.parseInt(args[0]);
@@ -110,7 +110,7 @@ public class Quantify_Enhanced {
 			int idx = 0;
 			int w = (int) (0.0125 * image.getWidth());
 			for (ClusterFeatures c : c_features) {
-				int off = -20;
+				int off = -60;
 				canvas.fillRect(c.x - w / 2, c.y - w / 2 + off, (int) (w * 2.5), 20, Color.lightGray.getRGB(), 0.25);
 				canvas.text(c.x - w / 2, c.y - w / 2 + off + 20, "Index: " + idx++, Color.RED);
 				off += 20;
@@ -124,8 +124,17 @@ public class Quantify_Enhanced {
 					canvas.fillRect(c.x - w / 2, c.y - w / 2 + off, (int) (w * 2.5), 20, Color.lightGray.getRGB(), 0.25);
 					canvas.text(c.x - w / 2, c.y - w / 2 + off + 20, AttributeHelper.getColorName(new Color(cc)) + ": " + c.quant.get(cc), Color.RED);
 				}
+			// check ratio
+				double ratio =  (double) c.dim.x / (double) c.dim.y;
+				off += 20;
+				if (ratio < 1.0) {
+					canvas.fillRect(c.x - w / 2, c.y - w / 2 + off, (int) (w * 2.5), 20, Color.RED.getRGB(), 0.35);
+					canvas.text(c.x - w / 2, c.y - w / 2 + off + 20, "wh-ratio: " + AttributeHelper.formatNumber(ratio, "0.000"), Color.WHITE);
+				} else {
+					canvas.fillRect(c.x - w / 2, c.y - w / 2 + off, (int) (w * 2.5), 20, Color.lightGray.getRGB(), 0.25);
+					canvas.text(c.x - w / 2, c.y - w / 2 + off + 20, "wh-ratio: " + AttributeHelper.formatNumber(ratio, "0.000"), Color.RED);
+				}
 			}
-			
 			// save debug image
 			image.saveToFile(f.getParent() + File.separator + "quantify_debug_" + f.getName());
 			
@@ -142,10 +151,7 @@ public class Quantify_Enhanced {
 					}
 					// check ratio
 					double ratio =  (double) c.dim.x / (double) c.dim.y;
-					if (ratio < 1.5)
-						tf.add(f.getParent() + File.separator + f.getName() + "_" + id + "\t" + "cluster_ratio" + "\t" + ratio);
-					else
-						tf.add(f.getParent() + File.separator + f.getName() + "_" + id + "\t" + "cluster_ratio" + "\t" + ratio);
+					tf.add(f.getParent() + File.separator + f.getName() + "_" + id + "\t" + "cluster_ratio" + "\t" + ratio);
 					id++;
 				}
 			} else {
