@@ -1,7 +1,0 @@
-#!/bin/bash
-for i in *.tif;
-do
-ST="$(basename $i .tif)"
-NUM=${ST:(-3)}
-mv "$i" "channel_"$NUM".tif";
-done
